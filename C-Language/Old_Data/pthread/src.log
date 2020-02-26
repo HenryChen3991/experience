@@ -1,0 +1,4 @@
+EX1_pthread.c
+	介紹基本pthread用法
+EX2_pthread.c
+	介紹pthread_mutexx_t用法

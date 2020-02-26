@@ -1,0 +1,1 @@
+cmd_/home/disk_D/henry03/cTest/kernel_Test/EX5/driver.ko := ld -r -m elf_i386 -T ./scripts/module-common.lds --build-id  -o /home/disk_D/henry03/cTest/kernel_Test/EX5/driver.ko /home/disk_D/henry03/cTest/kernel_Test/EX5/driver.o /home/disk_D/henry03/cTest/kernel_Test/EX5/driver.mod.o

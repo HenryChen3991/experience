@@ -1,0 +1,588 @@
+From 33a576ecbf5a54c92983d704d8473c1bb1907359 Mon Sep 17 00:00:00 2001
+From: henry_chen <henry_chen@gemteks.com>
+Date: Tue, 23 Jan 2018 10:21:54 +0800
+Subject: [PATCH] [ERTB-100][MISC] Add reset button behavior
+
+[Description]
+    press 1~4s to reboot system
+    press 5s to reset to default
+
+[Peer]
+    vettel,kenny
+
+[Unit test]
+    press 1~4s to reboot system
+    press 5s to reset to default
+
+Change-Id: I6a467df085421ef5600dc50d1c4ad5b3124a5d0a
+---
+ .../char/board/bcm963xx/impl1/board_util.c         |  41 +++-
+ .../char/board/bcm963xx/impl1/board_util.h         |   7 +-
+ bcmdrivers/opensource/char/plat-bcm/impl1/Makefile |   3 +
+ .../opensource/char/plat-bcm/impl1/bcm_extirq.c    | 214 ++++++++++++++++++++-
+ .../opensource/include/bcm963xx/bcm_extirq.h       |   3 +
+ shared/opensource/include/bcm963xx/bcmnetlink.h    |   4 +
+ targets/fs.src/etc/gtk_rbt_msg.sh                  |   7 +
+ userspace/private/apps/httpd/cgi_main.c            |   6 +-
+ userspace/private/apps/ssk/ssk.c                   |  59 +++++-
+ userspace/private/libs/cms_core/securitylog.c      |   3 +
+ 10 files changed, 336 insertions(+), 11 deletions(-)
+ mode change 100644 => 100755 bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.c
+ mode change 100644 => 100755 bcmdrivers/opensource/char/plat-bcm/impl1/Makefile
+ mode change 100644 => 100755 bcmdrivers/opensource/char/plat-bcm/impl1/bcm_extirq.c
+ mode change 100644 => 100755 bcmdrivers/opensource/include/bcm963xx/bcm_extirq.h
+ mode change 100644 => 100755 shared/opensource/include/bcm963xx/bcmnetlink.h
+ create mode 100755 targets/fs.src/etc/gtk_rbt_msg.sh
+ mode change 100644 => 100755 userspace/private/apps/ssk/ssk.c
+ mode change 100644 => 100755 userspace/private/libs/cms_core/securitylog.c
+
+diff --git a/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.c b/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.c
+old mode 100644
+new mode 100755
+index 6e3725d..115ce6a
+--- a/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.c
++++ b/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.c
+@@ -81,6 +81,9 @@
+ 
+ extern int g_ledInitialized;
+ 
++#ifdef ODM_GEMTEK
++#include "bcm_extirq.h"
++#endif //ODM_GEMTEK
+ // macAddrLock is used by kerSysGetMacAddress and kerSysReleaseMacAddress
+ // to protect access to g_pMacInfo
+ static PMAC_INFO g_pMacInfo = NULL;
+@@ -788,13 +791,41 @@ void kerSysLedCtrl(BOARD_LED_NAME ledName, BOARD_LED_STATE ledState)
+ /*functionto receive message from usersapce
+  * Currently we dont expect any messages fromm userspace
+  */
+-void kerSysRecvFrmMonitorTask(struct sk_buff *skb)
++void kerSysRecvFrmMonitorTask(struct sk_buff *__skb)
+ {
++#ifdef ODM_GEMTEK
++    struct sk_buff *skb = NULL;
++    struct nlmsghdr *nlh = NULL;
+ 
+-   /*process the message here*/
+-   printk(KERN_WARNING "unexpected skb received at %s \n",__FUNCTION__);
+-   kfree_skb(skb);
+-   return;
++    if( !__skb ) {
++        return;
++    }
++
++    skb = skb_get(__skb);
++    if( skb->len < NLMSG_SPACE(0)) {
++        return;
++    }
++
++    nlh = nlmsg_hdr(skb);
++
++    switch(nlh->nlmsg_type)
++    {
++        case MSG_NETLINK_ODM_GEMTEK_RESET_TO_DEFAULT_ACK:
++            kfree_skb(skb);
++            process_restore_to_default();
++            break;
++        default:
++            printk(KERN_WARNING "unexpected skb received at %s \n",__FUNCTION__);
++            kfree_skb(skb);
++            break;
++    }
++    return;
++#else
++    /*process the message here*/
++    printk(KERN_WARNING "unexpected skb received at %s \n",__FUNCTION__);
++    kfree_skb(__skb);
++    return;
++#endif //ODM_GEMTEK
+ }
+ 
+ void kerSysInitMonitorSocket( void )
+diff --git a/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.h b/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.h
+index a680d00..8bd47d2 100755
+--- a/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.h
++++ b/bcmdrivers/opensource/char/board/bcm963xx/impl1/board_util.h
+@@ -32,7 +32,9 @@
+ #define _BOARD_UTIL_H_
+ 
+ #include <bcm_hwdefs.h>
+-
++#ifdef ODM_GEMTEK
++#include "board.h"
++#endif //ODM_GEMTEK
+ /* Typedefs. */
+ typedef struct
+ {
+@@ -67,9 +69,8 @@ PMAC_INFO get_mac_info(void);
+ 
+ unsigned long getMemorySize(void);
+ void __init boardLedInit(void);
+-#if 1 //ODM_GEMTEK
++
+ void gtk_LedInit(void);
+-#endif //ODM_GEMTEK
+ void boardLedCtrl(BOARD_LED_NAME ledName, BOARD_LED_STATE ledState);
+ 
+ BOARD_IOC* board_ioc_alloc(void);
+diff --git a/bcmdrivers/opensource/char/plat-bcm/impl1/Makefile b/bcmdrivers/opensource/char/plat-bcm/impl1/Makefile
+old mode 100644
+new mode 100755
+index 5cd59a3..a26662b
+--- a/bcmdrivers/opensource/char/plat-bcm/impl1/Makefile
++++ b/bcmdrivers/opensource/char/plat-bcm/impl1/Makefile
+@@ -31,6 +31,9 @@ endif
+ EXTRA_CFLAGS +=  -I$(INC_BRCMDRIVER_PUB_PATH)/$(BRCM_BOARD) -I$(INC_BRCMSHARED_PUB_PATH)/$(BRCM_BOARD) -I$(INC_BRCMSHARED_PUB_PATH)/pmc
+ EXTRA_CFLAGS += -Werror -Wfatal-errors
+ 
++ifeq ("$(strip $(ODM_GEMTEK))","y")
++EXTRA_CFLAGS += -I$(BUILD_DIR)/bcmdrivers/opensource/char/board/bcm963xx/impl1
++endif
+ ifeq ($(filter-out 6858 63158 6846 6856 ,${BRCM_CHIP}),)
+ obj-$(CONFIG_ARM)$(CONFIG_ARM64) += bcm_ru_map.o
+ EXTRA_CFLAGS += -I$(SHARED_DIR)/opensource/drv/lport/ag -DBDMF_SESSION_H -D_BDMF_INTERFACE_H_ -D_BDMF_SYSTEM_H_ -DBDMF_MON_H -DNO_BDMF_HANDLE 
+diff --git a/bcmdrivers/opensource/char/plat-bcm/impl1/bcm_extirq.c b/bcmdrivers/opensource/char/plat-bcm/impl1/bcm_extirq.c
+old mode 100644
+new mode 100755
+index f8d9e7d..58b4521
+--- a/bcmdrivers/opensource/char/plat-bcm/impl1/bcm_extirq.c
++++ b/bcmdrivers/opensource/char/plat-bcm/impl1/bcm_extirq.c
+@@ -31,6 +31,12 @@
+ #include <linux/kthread.h>
+ #include <linux/reboot.h>
+ #include <linux/sched.h>
++#ifdef ODM_GEMTEK
++#include <linux/kmod.h>
++#include <linux/slab.h>
++#include "bcmnetlink.h"
++#include "board_util.h"
++#endif
+ 
+ #include <bcmtypes.h>
+ #include <bcm_map_part.h>
+@@ -59,6 +65,20 @@ static irqreturn_t reset_isr(int irq, void *dev_id);
+ /* restore default work structure */
+ static struct work_struct restoreDefaultWork;
+ 
++#ifdef ODM_GEMTEK
++static struct timer_list resetBtn_timer;
++static unsigned short resetBtn_irq = BP_NOT_DEFINED;
++static unsigned long startJiffies = 0;
++#define RESET_TIME 2000
++#define RESTORE__TO_DEFAULT_TIME 10000
++static void resetBtn_timer_handler(unsigned long arg);
++static struct work_struct resetWork;
++static struct work_struct telnetResetMsg;
++
++char mfgMode = 'C';
++extern PNVRAM_DATA readNvramData(void);
++#endif //ODM_GEMTEK
++
+ 
+ static int set_ext_irq_info(unsigned short ext_irq)
+ {
+@@ -247,7 +267,35 @@ void init_reset_irq(void)
+                 
+             if(hookisr)
+             {
+-                ext_irq_connect(rstToDflt_irq, (void*)&dev, (FN_HANDLER)reset_isr);
++#ifdef ODM_GEMTEK
++                extern int BpGetBoardId(char * pszBoardId);
++                char boardid[BP_BOARD_ID_LEN] = {0};
++                BpGetBoardId(boardid);
++                if(strcmp(boardid,"singtel") == 0 ||
++                   strcmp(boardid,"801XGS") == 0 ||
++                   strcmp(boardid,"WGRTB-123ACN") == 0 ||
++                   strcmp(boardid,"GAPB-113") == 0 ||
++                   strcmp(boardid,"ERTB-100") == 0)
++                {
++                    resetBtn_irq = map_external_irq (rstToDflt_irq);
++                    init_timer(&resetBtn_timer);
++                    resetBtn_timer.function = resetBtn_timer_handler;
++                    resetBtn_timer.expires  = jiffies + msecs_to_jiffies(100); /* 100 msec */
++                    resetBtn_timer.data	    = 0;
++                    ext_irq_connect(rstToDflt_irq, (void*)&dev, (FN_HANDLER)reset_isr);
++                }
++
++                // We give GAPB-113 about mfg conditional flag on later determined.
++                if (!strcmp(boardid, "GAPB-113")) {
++                    NVRAM_DATA *pNvramData = NULL;
++
++                    pNvramData = readNvramData();
++                    mfgMode = pNvramData->gtk_FwFlag[0];
++                    kfree(pNvramData);
++                }
++#else
++                    ext_irq_connect(rstToDflt_irq, (void*)&dev, (FN_HANDLER)reset_isr);
++#endif //ODM_GEMTEK
+             }
+         }
+     }
+@@ -331,9 +379,145 @@ static void restore_to_default_thread(void *arg)
+     return;
+ }
+ 
++#ifdef ODM_GEMTEK
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20)
++static void reset_thread(struct work_struct *work)
++#else
++static void reset_thread(void *arg)
++#endif //ODM_GEMTEK
++{
++    kernel_restart(NULL);
++
++    return;
++}
++
++void process_restore_to_default(void)
++{
++    INIT_WORK(&restoreDefaultWork, restore_to_default_thread);
++    schedule_work(&restoreDefaultWork);
++}
++
++static Bool resetBtn_pressed(void)
++{
++       unsigned int intSts = 0, extIntr;
++       int actHigh = 0;
++       Bool pressed = 1;
++#if defined(CONFIG_BCM96838) || defined(CONFIG_BCM96858)
++               if ((resetBtn_irq >= INTERRUPT_ID_EXTERNAL_0) && (resetBtn_irq <= INTERRUPT_ID_EXTERNAL_5)) {
++#else
++               if ((resetBtn_irq >= INTERRUPT_ID_EXTERNAL_0) && (resetBtn_irq <= INTERRUPT_ID_EXTERNAL_3)) {
++#endif
++#if defined(CONFIG_BCM963138) || defined(CONFIG_BCM963148)  || defined(CONFIG_BCM96858)
++#ifdef ODM_GEMTEK
++                       if(BpGetResetToDefaultExtIntrGpio(&resetBtn_gpio) == BP_SUCCESS)
++                           resetBtn_gpio &= BP_GPIO_NUM_MASK;
++                       else
++                       {
++                           printk("\n***resetBtn_gpio is not defined ***\n\n");
++                           return 0;
++                       }
++                       intSts = kerSysGetGpioValue(resetBtn_gpio);
++                       //intSts = kerSysGetGpioValue(MAP_EXT_IRQ_TO_GPIO( resetBtn_irq - INTERRUPT_ID_EXTERNAL_0));
++                       /*Derek 20180314
++                       mark code "intSts = kerSysGetGpioValue(MAP_EXT_IRQ_TO_GPIO( resetBtn_irq - INTERRUPT_ID_EXTERNAL_0));"
++                       It seem not flexible ,due to the reset gpio will be always GPIO 32 in chip 963138,963148.( MAP_EXT_IRQ_TO_GPIO( resetBtn_irq - INTERRUPT_ID_EXTERNAL_0) is always equal to 32)
++                       Use "BpGetResetToDefaultExtIntrGpio" to get reset gpio , but bp_usExtIntrResetToDefault must be configured in boaraparms.c.
++                       */
++
++                       //Kenny 20161012 hardcode use GPIO_54 according to boardparams.c setting
++                       //due to BRCM not release patch for MAP_EXT_IRQ_TO_GPIO() on 68580
++                       //intSts = kerSysGetGpioValue(54);  //not work
++#else
++                       intSts = kerSysGetGpioValue(MAP_EXT_IRQ_TO_GPIO( resetBtn_irq - INTERRUPT_ID_EXTERNAL_0));
++#endif //ODM_GEMTEK
++#elif defined(CONFIG_BCM963381) || defined(CONFIG_BCM96848)
++                       intSts = PERF->Ext1IrqSt & (1 << (resetBtn_irq - INTERRUPT_ID_EXTERNAL_0 + EI_STATUS_SHFT));
++#else
++                       intSts = PERF->ExtIrqCfg & (1 << (resetBtn_irq - INTERRUPT_ID_EXTERNAL_0 + EI_STATUS_SHFT));
++#endif
++
++               }
++               else
++                       return 0;
++
++               extIntr = extIntrInfo[resetBtn_irq-INTERRUPT_ID_EXTERNAL_0];
++               actHigh = IsExtIntrTypeActHigh(extIntr);
++
++               if( ( actHigh && intSts ) || (!actHigh && !intSts ) )
++                       pressed = 1;
++               else
++                       pressed = 0;
++    return pressed;
++}
++static void resetBtn_timer_handler(unsigned long arg)
++{
++    unsigned long currentJiffies = jiffies;
++    if ( resetBtn_pressed() )
++    {
++         if ( currentJiffies >= startJiffies + msecs_to_jiffies( RESTORE__TO_DEFAULT_TIME) )
++         {
++                 del_timer(&resetBtn_timer);
++                 if ( !restore_in_progress )
++                 {
++                      printk("\n***Do reset to default!!!***\n\n");
++                      kerSysSendtoMonitorTask(MSG_NETLINK_ODM_GEMTEK_RESET_TO_DEFAULT,NULL,0);
++                      restore_in_progress  = 1;
++                 }
++          }
++         else
++         {
++                mod_timer(&resetBtn_timer, currentJiffies + msecs_to_jiffies(100));
++         }
++    }
++    else
++    {
++         if( currentJiffies >= startJiffies + msecs_to_jiffies( RESET_TIME))
++         {
++                 del_timer(&resetBtn_timer);
++                 printk("\n***Do system reboot***\n\n");
++                 INIT_WORK(&resetWork, reset_thread);
++                 schedule_work(&resetWork);
++         }
++         else
++         {
++#if defined(CONFIG_BCM963138) || defined(CONFIG_BCM963148)   || defined(CONFIG_BCM96858) || defined(CONFIG_BCM96846)
++           BcmHalExternalIrqUnmask(resetBtn_irq);
++#else
++           BcmHalInterruptEnable(resetBtn_irq);
++#endif
++          }
++    }
++}
++#endif
++#ifdef ODM_GEMTEK
++static void telnet_reset_message(struct work_struct *work)
++{
++
++       char cmdPath[]="/bin/sh";
++       char* cmdEnvp[]={"HOME=/","PATH=/sbin:/bin:/usr/bin",NULL};
++       char str_reset_time[12];
++       char str_restore__to_default_time[12];
++       char* cmdArgv[]={cmdPath,"/etc/gtk_rbt_msg.sh",str_reset_time,str_restore__to_default_time,NULL};
++
++       //convert int to char*
++       snprintf(str_reset_time,sizeof(str_reset_time),"%d",RESET_TIME);
++       snprintf(str_restore__to_default_time,sizeof(str_restore__to_default_time),"%d",RESTORE__TO_DEFAULT_TIME);
++
++       call_usermodehelper(cmdPath,cmdArgv,cmdEnvp,UMH_WAIT_PROC);
++       return;
++}
++#endif //ODM_GEMTEK
++
+ static irqreturn_t reset_isr(int irq, void *dev_id)
+ {
+     int isOurs = 1, ext_irq_idx = 0, value=0;
++#ifdef ODM_GEMTEK
++        unsigned long currentJiffies = jiffies;
++        extern int BpGetBoardId(char * pszBoardId);
++        char boardid[BP_BOARD_ID_LEN] = {0};
++        BpGetBoardId(boardid);
++#endif //ODM_GEMTEK
+ 
+     //printk("reset_isr called irq %d, gpio %d 0x%lx\n", irq, *(int *)dev_id, PERF->IrqControl32[0].IrqMaskHi);
+ 
+@@ -351,10 +535,38 @@ static irqreturn_t reset_isr(int irq, void *dev_id)
+     {
+         if( !restore_in_progress )
+         {
++#ifdef ODM_GEMTEK
++            if(strcmp(boardid,"singtel") == 0 ||
++               strcmp(boardid,"801XGS") == 0 ||
++               strcmp(boardid,"WGRTB-123ACN") == 0 ||
++               strcmp(boardid,"GAPB-113") == 0 ||
++               strcmp(boardid,"ERTB-100") == 0)
++            {
++                printk("*** Reset button pressed (Pressed %d~%d sec do reset, %d sec reset to default) ***\n",(RESET_TIME/1000),((RESTORE__TO_DEFAULT_TIME/1000)-1),RESTORE__TO_DEFAULT_TIME/1000);
++                INIT_WORK(&telnetResetMsg, telnet_reset_message);
++                schedule_work(&telnetResetMsg);
++
++                // If GAPB-113 and M flag, we mask r2d button isr timer. So without M flag, timer still works.
++                if (strcmp(boardid,"GAPB-113") == 0 ){
++                    if (mfgMode != 'M') {
++                        mod_timer(&resetBtn_timer, (currentJiffies + msecs_to_jiffies(100)));             /* 100 msec */
++                        startJiffies = currentJiffies;
++                    }
++                }
++                else {
++                    mod_timer(&resetBtn_timer, (currentJiffies + msecs_to_jiffies(100)));		  /* 100 msec */
++                    startJiffies = currentJiffies;
++                }
++                #if defined(CONFIG_BCM963138) || defined(CONFIG_BCM963148) || defined(CONFIG_BCM96858) || defined(CONFIG_BCM96846)
++                    BcmHalExternalIrqMask(irq);
++                #endif
++            }
++#else
+             restore_in_progress  = 1;
+             printk("\n***reset button press detected***\n\n");
+             INIT_WORK(&restoreDefaultWork, restore_to_default_thread);
+             schedule_work(&restoreDefaultWork);
++#endif //ODM_GEMTEK
+         }
+ #if defined(CONFIG_BCM94908)  || defined(CONFIG_BCM96858) | \
+     defined(CONFIG_BCM963158) || defined(CONFIG_BCM96846) || defined(CONFIG_BCM96856)
+diff --git a/bcmdrivers/opensource/include/bcm963xx/bcm_extirq.h b/bcmdrivers/opensource/include/bcm963xx/bcm_extirq.h
+old mode 100644
+new mode 100755
+index f72114a..be751ea
+--- a/bcmdrivers/opensource/include/bcm963xx/bcm_extirq.h
++++ b/bcmdrivers/opensource/include/bcm963xx/bcm_extirq.h
+@@ -35,6 +35,9 @@
+ 
+ extern unsigned int extIntrInfo[NUM_EXT_INT];
+ 
++#ifdef ODM_GEMTEK
++void process_restore_to_default(void);
++#endif //ODM_GEMTEK
+ int map_external_irq (int irq);
+ void bcm_extirq_init(void);
+ void init_reset_irq(void);
+diff --git a/shared/opensource/include/bcm963xx/bcmnetlink.h b/shared/opensource/include/bcm963xx/bcmnetlink.h
+old mode 100644
+new mode 100755
+index e6f5999..f7a37c0
+--- a/shared/opensource/include/bcm963xx/bcmnetlink.h
++++ b/shared/opensource/include/bcm963xx/bcmnetlink.h
+@@ -66,6 +66,10 @@
+ 
+ #define MSG_NETLINK_BRCM_CALLBACK_DSL_DRV	0X0100
+ 
++#ifdef ODM_GEMTEK
++#define MSG_NETLINK_ODM_GEMTEK_RESET_TO_DEFAULT 0X0200
++#define MSG_NETLINK_ODM_GEMTEK_RESET_TO_DEFAULT_ACK 0X0300
++#endif //ODM_GEMTEK
+ extern void kerSysSendtoMonitorTask(int msgType, char *msgData, int msgDataLen);
+ 
+ #endif /*_BCMNETLINK_H */
+diff --git a/targets/fs.src/etc/gtk_rbt_msg.sh b/targets/fs.src/etc/gtk_rbt_msg.sh
+new file mode 100755
+index 0000000..c066db3
+--- /dev/null
++++ b/targets/fs.src/etc/gtk_rbt_msg.sh
+@@ -0,0 +1,7 @@
++#!/bin/sh
++#
++#ifdef ODM_GEMTEK
++#
++#Gemtek script for sending reboot message to telnet
++
++echo "*** Reset button pressed (Pressed `expr $1 / 1000` ~ `expr $2 / 1000 - 1` sec do reset, `expr $2 / 1000` sec reset to default) ***" > /dev/ttyp0
+diff --git a/userspace/private/apps/httpd/cgi_main.c b/userspace/private/apps/httpd/cgi_main.c
+index 7a64797..669a7c9 100644
+--- a/userspace/private/apps/httpd/cgi_main.c
++++ b/userspace/private/apps/httpd/cgi_main.c
+@@ -666,8 +666,12 @@ void do_cgi(char *path, FILE *fs) {
+          CMSLOG_SEC_SET_APP_NAME(&logData, "HTTP");
+          CMSLOG_SEC_SET_USER(&logData, &glbWebVar.curUserName[0]);
+          CMSLOG_SEC_SET_SRC_IP(&logData, &glbWebVar.pcIpAddr[0]);
+-         cmsLog_security(LOG_SECURITY_AUTH_RESOURCES, &logData, "Restore default settings");
+ 
++#ifdef ODM_GEMTEK
++         cmsLog_security(LOG_SECURITY_AUTH_RESOURCES, &logData, "Restore default settings by using GUI");
++#else
++         cmsLog_security(LOG_SECURITY_AUTH_RESOURCES, &logData, "Restore default settings");
++#endif //ODM_GEMTEK
+          /* this invalidates the config flash, which will cause us to use
+           * default values in MDM next time we reboot. */
+          cmsMgm_invalidateConfigFlash();
+diff --git a/userspace/private/apps/ssk/ssk.c b/userspace/private/apps/ssk/ssk.c
+old mode 100644
+new mode 100755
+index df9b94e..802f464
+--- a/userspace/private/apps/ssk/ssk.c
++++ b/userspace/private/apps/ssk/ssk.c
+@@ -70,6 +70,10 @@
+ #include <linux/rtnetlink.h>
+ #include <time.h>
+ 
++#include <sys/signal.h>
++#include <signal.h>
++#include "cms_seclog.h"
++
+ #if defined (DMP_TIME_1) || defined (DMP_DEVICE2_TIME_1)
+ #include "ssk_time.h"
+ #endif
+@@ -84,6 +88,9 @@ const CmsEntityId myEid=EID_SSK;
+ UBOOL8 useConfiguredLogLevel=TRUE;
+ UBOOL8 isLowMemorySystem=FALSE;
+ CmsTimestamp bootTimestamp;
++#ifdef ODM_GEMTEK
++#define MAX_PAYLOAD 128
++#endif //ODM_GEMTEK
+ 
+ #ifdef SUPPORT_MOCA
+ SINT32 mocaMonitorFd = CMS_INVALID_FD;
+@@ -1383,6 +1390,47 @@ CmsRet initKernelMonitorFd()
+    return ret;
+ }
+ 
++#ifdef ODM_GEMTEK
++
++void sendMsgToKernel(int sock_fd, int msgType,char *msgData, int msgDataLen)
++{
++        struct nlmsghdr *nlh = NULL;
++        struct sockaddr_nl dest_addr;
++
++        if(msgDataLen > MAX_PAYLOAD)
++        {
++            cmsLog_error("invalid message len in %s",__FUNCTION__);
++            return;
++        }
++
++        nlh = (struct nlmsghdr *)malloc(NLMSG_SPACE(msgDataLen));
++        nlh->nlmsg_type = msgType;
++        nlh->nlmsg_pid=0;
++        nlh->nlmsg_len = NLMSG_LENGTH(msgDataLen);
++        nlh->nlmsg_flags =0;
++
++        if(msgData)
++        {
++            memcpy(NLMSG_DATA(nlh),msgData,msgDataLen);
++        }
++
++        memset(&dest_addr, 0, sizeof(struct sockaddr_nl));
++        dest_addr.nl_family = AF_NETLINK;
++        dest_addr.nl_pid = 0;
++        dest_addr.nl_groups = 0;
++
++        if( sendto(sock_fd, nlh, nlh->nlmsg_len, 0, (struct sockaddr *)&dest_addr, sizeof(struct sockaddr_nl)) < 0 ) {
++                cmsLog_error("send msg to kernel space error!\n");
++                free(nlh);
++                return;
++        }
++
++        free(nlh);
++        return;
++}
++
++#endif //ODM_GEMTEK
++
+ /** Receive and process netlink messages from Broadcom proprietary/legacy
+  * netlink socket.
+  */
+@@ -1390,6 +1438,9 @@ void processKernelMonitor(void)
+ {
+    int recvLen;
+    char buf[4096];
++#ifdef ODM_GEMTEK
++   CmsSecurityLogData logData = EMPTY_CMS_SECURITY_LOG_DATA;
++#endif //ODM_GEMTEK
+    struct iovec iov = { buf, sizeof buf };
+    struct sockaddr_nl nl_srcAddr;
+    struct msghdr msg ;
+@@ -1463,7 +1514,13 @@ void processKernelMonitor(void)
+             memcpy ((char *) &nl_msgData, NLMSG_DATA(nl_msgHdr), sizeof (nl_msgData)) ;
+             processTrafficMismatchMessage(nl_msgData) ;
+             break;
+-
++#ifdef ODM_GEMTEK
++         case MSG_NETLINK_ODM_GEMTEK_RESET_TO_DEFAULT:
++            cmsLog_debug("received MSG_NETLINK_ODM_GEMTEK_RESET_TO_DEFAULT message\n");
++            cmsLog_security(LOG_SECURITY_AUTH_RESOURCES, &logData, "Restore default settings by pressing reset button");
++            sendMsgToKernel(kernelMonitorFd,MSG_NETLINK_ODM_GEMTEK_RESET_TO_DEFAULT_ACK, NULL, 0);
++            break;
++#endif //ODM_GEMTEK
+     /* For the 63138 and 63148, implement a workaround to strip bytes and
+        allow OAM traffic due to JIRA HW63138-12 */
+ #if defined (CONFIG_BCM963138) || defined (CONFIG_BCM963148)
+diff --git a/userspace/private/libs/cms_core/securitylog.c b/userspace/private/libs/cms_core/securitylog.c
+old mode 100644
+new mode 100755
+index 5dca57f..a5c5b2e
+--- a/userspace/private/libs/cms_core/securitylog.c
++++ b/userspace/private/libs/cms_core/securitylog.c
+@@ -54,6 +54,9 @@
+ #include "cms_seclog.h"
+ #include <errno.h>
+ 
++#ifdef ODM_GEMTEK
++#define CMS_SECURITY_LOG 1
++#endif //ODM_GEMTEK
+ #ifdef CMS_SECURITY_LOG
+ 
+ char * securityLogStrings[LOG_SECURITY_MAX] =
+-- 
+1.9.1
+

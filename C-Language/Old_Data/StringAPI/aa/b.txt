@@ -1,0 +1,5 @@
+Firmware version=v0.0.0.1
+Build_timestamp=180209_1139
+Author=toby_li <toby_li@gemteks.com>
+Commit ID=bbe91d9162df25d6070444fcfb15f918f146d11d
+Commit date=2018-02-01 17:59:35 +0800

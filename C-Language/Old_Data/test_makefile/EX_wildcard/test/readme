@@ -1,0 +1,24 @@
+執行結果分析：
+第一行輸出：
+a.c b.c ./sub/sa.c ./sub/sb.c
+wildcard把 指定目錄 ./ 和 ./sub/ 下的所有後綴是c的文件全部展開。
+第二行輸出：
+a.c b.c sa.c sb.c
+notdir把展開的文件去除掉路徑信息
+第三行輸出：
+a.o b.o sa.o sb.o
+在$(patsubst %.c,%.o,$(dir) )中，patsubst把$(dir)中的變量符合後綴是.c的全部替換成.o，任何輸出。
+或者可以使用
+obj=$(dir:%.c=%.o)
+效果也是一樣的。
+這裡用到makefile裡的替換引用規則，即用您指定的變量替換另一個變量。
+它的標準格式是
+$(var:a=b) 或 ${var:a=b}
+它的含義是把變量var中的每一個值結尾用b替換掉a
+
+
+PS.
+SRC = $(wildcard *.c)
+等於指定編譯當前目錄下所有.c文件，如果還有子目錄，比如子目錄為inc，則再增加一個wildcard函數，像這樣：
+SRC = $(wildcard *.c) $(wildcard inc/*.c)
+

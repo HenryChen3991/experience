@@ -1,0 +1,1 @@
+cmd_/home/disk_D/henry03/cTest/kernel_Test/EX3_檔案讀寫/fileIO.ko := ld -r -m elf_i386 -T ./scripts/module-common.lds --build-id  -o /home/disk_D/henry03/cTest/kernel_Test/EX3_檔案讀寫/fileIO.ko /home/disk_D/henry03/cTest/kernel_Test/EX3_檔案讀寫/fileIO.o /home/disk_D/henry03/cTest/kernel_Test/EX3_檔案讀寫/fileIO.mod.o

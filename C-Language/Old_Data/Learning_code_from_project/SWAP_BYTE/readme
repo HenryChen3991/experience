@@ -1,0 +1,12 @@
+#define ENDIAN_SWAP16(value) \
+         ((((unsigned short)((value) & 0x00FF)) << 8) | \
+           (((unsigned short)((value) & 0xFF00)) >> 8))
+
+#define ENDIAN_SWAP32(value) \
+         ((((unsigned long)((value) & 0x000000FF)) << 24) | \
+           (((unsigned long)((value) & 0x0000FF00)) << 8) | \
+           (((unsigned long)((value) & 0x00FF0000)) >> 8) | \
+           (((unsigned long)((value) & 0xFF000000)) >> 24))
+
+16bits 和 32bits的位元交換
+最右邊一byte移至最左邊

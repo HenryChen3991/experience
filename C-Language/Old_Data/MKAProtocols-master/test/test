@@ -1,0 +1,31 @@
+gio 23 ott 2014 18:44:59 CEST 
+
+BD1:
+	Il tempo totale scala correttamente da 168 a 64 (aumenta con fattore 2.625),
+	ma non da 64 a 16: dovrebbe aumentare di un fattore 4, invece aumenta solo 
+	di un fattore 2.852. Anche i tempi delle (due) moltiplicazioni effettuate 
+	dall'algoritmo seguono questo pattern. 
+	
+BD2: 
+	Nel master da 168 a 64 tutto ok, i tempi aumentano come previsto 
+	(sia tempo totale che moltiplicazioni). Passando da 64 a 16 stavolta i tempi 
+	peggiorano PIÙ del previsto: di un fattore 5 anziché di un fattore 4.
+	Altra anomalia: delle 3 moltiplicazioni la prima e la terza hanno tempi 
+	identici, la seconda è 3 volte più veloce (in ogni frequenza di clock).
+	Nello slave i tempi totali di esecuzione scalano correttamente (anche da 64 
+	a 16). L'unica annotazione riguarda i tempi delle mul passando da 64 a 16, 
+	risultano essere più veloci del previsto, anche se il tempo totale è poi
+	in linea con le aspettative (questo è dovuto al fatto che mentre a 64 
+    le mul occupano oltre il 70% del tempo di esecuzione, a 16 solo il 50%).
+
+MKA:
+	Da 168 a 64 tutto ok. Da 64 a 16 abbiamo ancora un peggioramento di un 
+	fattore 5. Abbiamo fatto una prova anche a 32, rilevando che anche da 64 a 
+	32 il peggioramento è superiore alla stima (2.6 invece di 2). Da 32 a 16
+	siamo invece dentro le previsioni.
+
+GDH2:
+	Da 168 a 64 tutto ok. Da 64 a 16 abbiamo ancora un peggioramento di un 
+	fattore 5. Idem per lo slave.
+	
+	

@@ -1,0 +1,10 @@
+#makefile2 
+
+VAR_M2 := Makefile2
+
+all: debug
+
+debug:
+	@echo "*****Makefile 2 Start******"
+	@echo "debug"
+	@echo "*****Makefile 2 End******"
