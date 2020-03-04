@@ -1,0 +1,57 @@
+{
+"file_note": "True",
+"namespace": "decorator_encode",
+"path":      "decorator_encode",
+"trace":     "True",
+"note":      "When parse package, use wrapper to add header or remove header.",
+
+"classes": {
+	"interface":{
+		"type":"interface",
+		"members": [
+			["pure_virtual", "write", "void", "char *buf"],
+			["pure_virtual", "read", "void", "char *buf"]
+		],
+
+		"inheritances": {
+			"core":{
+				"members": [ ["override",  "<ALL>"],
+					["init","init", "void", "", "private"]
+				 ]
+			},
+			"decorator":{
+				"enable_destructor":"True",
+				"members": [ ["override",  "<ALL>"],
+					["init",  "init",    "void",               "struct interface *inner"],
+					["var",   "_inner",  "struct interface *", "", "private"]
+				],
+
+				"inheritances": {
+					"wrapper":{
+						"members": [ ["override",  "<ALL>"],
+							["init","init", "void", "struct interface *inner, char *str"]
+						]
+					}
+				}
+			}
+		}
+	},
+
+	"test":{
+		"includes":["wrapper", "core"],
+		"templates":["_test"],
+		"members": [
+			["static_method", "test_me", "int", "", "private", "", """
+				<br> Interface *object = new Wrapper(new Wrapper(new Wrapper(new Core(), '123'), 
+				<br> 'abc'), '987');
+				<br> string buf;
+				<br> object->write(buf);
+				<br> cout << 'main: ' << buf << endl;
+				<br> object->read(buf);
+				<br> delete object;
+			"""
+			],
+		],
+	}
+}
+}

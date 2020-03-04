@@ -1,0 +1,1 @@
+/usr/bin/cc     CMakeFiles/hash_table.dir/main.c.o  -o hash_table 

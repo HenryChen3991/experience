@@ -1,0 +1,67 @@
+{
+"file_note":"True",
+"namespace"      :"bridge_shape",
+"path"           :"bridge_shape",
+"note"           :"""Composite better than inheritances,
+<br> When:
+<br> =====
+<br> 
+<br>                    ----Shape---
+<br>                   /            \\
+<br>          Rectangle              Circle
+<br>         /        \\            /      \\
+<br> BlueRectangle  RedRectangle BlueCircle RedCircle
+<br> 
+<br> Refactor to:
+<br> ============
+<br> 
+<br>           ----Shape---                        Color
+<br>          /           \\                      /    \\
+<br> Rectangle(Color)   Circle(Color)           Blue   Red
+""",
+
+"classes": {
+	"shape":{
+		"enable_destructor":"True",
+		"includes":["color"],
+		"members": [
+			["var", "_color", "struct color *", "", "private"],
+			["virtual", "draw", "void", ""],
+		],
+
+		"inheritances": {
+			"shape_rectangle, shape_circle":{
+				"members": [ ["override",  "<ALL>"],
+				],
+			},
+		}
+	},
+
+	"color":{
+		"members": [ ["virtual", "render", "void"],
+		],
+
+		"inheritances": {
+			"color_blue, color_red":{
+				"members": [ ["override",  "<ALL>"],
+				],
+			},
+		},
+	},
+
+	"test":{
+		"templates":["_test"],
+		"includes" :["color_blue", "color_red", "shape_rectangle", "shape_circle"],
+		"members"  :[
+			["static_method", "test_me", "int", "", "private","","""
+				<br>void color_init(struct color *color)
+				<br>{
+				<br>	printf(\"color_init\\n\");
+				<br>	memset(color, sizeof(*color), 0);
+				<br>	color->ops = &color_ops;
+				<br>}
+			"""],
+		],
+	},
+},
+}

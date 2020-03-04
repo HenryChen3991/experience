@@ -1,0 +1,69 @@
+{
+"file_note": "True",
+"namespace": "bridge_stack",
+"path":      "bridge_stack",
+
+"classes": {
+	"node":{
+		"members": [
+			["var", "val", "int"],
+			["var", "prev", "struct node *"],
+			["var", "next", "struct node *"]
+		]
+	},
+
+	"stack":{
+		"includes":["stack_impl"],
+		"members": [
+			["virtual", "push", "void", "int val"],
+			["virtual", "pop", "int"],
+			["virtual", "top", "int"],
+			["virtual", "is_empty", "int"],
+			["virtual", "is_full", "int"],
+			["var", "_impl", "struct stack_impl *", "", "private"]
+		],
+		"enable_super":"True",
+		"enable_destructor":"True",
+
+		"inheritances": {
+			"stack_hanoi":{
+				"members": [ ["override",  "push"] ]
+			},
+			"stack_fifo":{
+				"members": [ ["override",  "pop"] ]
+			}
+		}
+	},
+
+	"stack_impl":{
+		"members": [
+			["virtual", "push", "void", "int val"],
+			["virtual", "pop", "int"],
+			["virtual", "top", "int"],
+			["virtual", "is_empty", "int"],
+			["virtual", "is_full", "int"]
+		],
+		"enable_destructor":"True",
+
+		"inheritances": {
+			"stack_impl_array":{
+				"members": [ ["override",  "<ALL>"],
+					["var", "items", "int", "[32]", "private"],
+					["var", "total", "int", "", "private"]
+				]
+			},
+			"stack_impl_list":{
+				"includes":["node"],
+				"members": [ ["override",  "<ALL>"],
+					["var", "nodes", "struct node *", "", "private"]
+				]
+			}
+		}
+	},
+
+	"test":{
+		"includes":["stack_hanoi", "stack_fifo", "stack_impl_array", "stack_impl_list"],
+		"templates":["_test"]
+	}
+}
+}

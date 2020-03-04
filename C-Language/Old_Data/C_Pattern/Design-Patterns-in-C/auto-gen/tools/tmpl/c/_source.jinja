@@ -1,0 +1,23 @@
+{% block file_header %}{% endblock %}
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <mycommon.h>
+{% if supers or _have_vtable_new %}#include <myobj.h>{% endif %}
+#include "{{ name }}.h"
+{% block private_class_init %}{% endblock %}
+
+{% block message %}{% endblock %}
+{% block error %}{% endblock %}
+
+{% block include_impl %}{% endblock %}
+{% block inline_method %}{% endblock %}
+{% block private_method %}{% endblock %}
+{%- if _have_vtable_new -%}
+	{%- block vtable_impl %}{% endblock -%}
+	{%- block vtable_set %}{% endblock -%}
+{%- endif -%}
+{% block supers %}{% endblock %}
+{% block class_init %}{% endblock %}
+{% block public_method %}{% endblock %}

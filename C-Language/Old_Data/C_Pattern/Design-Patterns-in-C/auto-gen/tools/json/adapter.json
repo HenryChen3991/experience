@@ -1,0 +1,29 @@
+{
+"file_note": "True",
+"namespace": "adapter",
+"path":      "adapter",
+
+"classes": {
+	"target":{
+		"members": [
+			["virtual", "request", "void"]
+		],
+
+		"inheritances": {
+			"adapter":{
+				"includes":["adaptee"],
+				"members": [
+					["override",  "<ALL>"],
+					["var", "_adaptee", "struct adaptee *", "", "private"],
+				],
+			},
+		},
+	},
+
+	"adaptee":{
+		"members": [
+			["method", "specific_request",  "void"]
+		]
+	}
+}
+}

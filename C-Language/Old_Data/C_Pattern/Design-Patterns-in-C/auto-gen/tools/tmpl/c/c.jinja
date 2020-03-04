@@ -1,0 +1,128 @@
+{%- extends '_source.jinja' -%}
+{%- import '_macro.jinja' as func -%}
+
+{% block file_header %}{% if file_note -%}
+	{{- func.file_header(file_name,copyright,author,date,summary,note) -}}
+{% endif %}{% endblock %}
+
+{% block message %}
+{% if message %}TODO({{ message }}){% endif %}
+{% endblock %}
+
+{% block error %}
+{% if error %}(...) _Static_assert(0, "{{ error }}"){% endif %}
+{% endblock %}
+
+{% block include_impl %}
+	{%- if includes -%}
+		{%- for one_include in includes %}{% if one_include is contain('.') %}
+#include "{{ one_include }}"
+		{%- endif -%}{%- endfor -%}
+	{%- endif -%}
+{% endblock %}
+
+{%- block inline_method -%}
+{{- func.macro_loop_functions(trace,name,inlines,'inlines',mode='impl-print',scope='private', qualifier='static inline') }}
+{%- endblock -%}
+
+{%- block private_method -%}
+{{ func.macro_loop_functions(trace,name,methods,'methods',mode='impl-print',scope='private',qualifier='static') }}
+{%- endblock -%}
+
+{# static = false: skip pure-virtual #}
+{%- block vtable_impl -%}
+{{ func.macro_loop_functions(trace,name,virtuals,'virtuals',mode='impl-print',pure='False',qualifier='static') }}
+{%- endblock -%}
+
+{# static = false: skip pure-virtual #}
+{%- block vtable_set %}
+static struct {{ name }}_ops {{ name }}_ops = {
+	{{- func.macro_loop_functions(trace,name,virtuals,'virtuals',mode='assign',pure='False') }}
+};
+{%- endblock -%}
+
+{##################################}
+{%- macro fetch_ops_name(name, super_idx, vtable_idx) -%}
+{{ name }}_ops{%- if super_idx > 1 -%}_{{ super_idx }}{%- endif -%}{%- if vtable_idx > 1 -%}_{{ vtable_idx }}{%- endif -%}
+{%- endmacro -%}
+{##################################}
+
+{%- block supers -%}{%- if supers -%}
+{%- for parent_name,parent_vtables in supers.iteritems() -%}
+	{%- set outer_loop = loop -%}
+	{%- set func_postfix = '' -%}
+
+	{%- for vtable_class_name,vtable_class_detail in parent_vtables.iteritems() -%}
+		{%- if outer_loop.index > 1 -%}{%- set func_postfix = outer_loop.index -%}{%- endif -%}
+	{{- func.macro_loop_functions(trace,name,vtable_class_detail['virtuals'],'virtuals',mode='impl-print',abstract_name=vtable_class_name,abstract_path=vtable_class_detail['path'],qualifier='static',postfix=func_postfix) }}
+{# parent ops #}
+static struct {{ vtable_class_name }}_ops {{ fetch_ops_name(vtable_class_name, outer_loop.index, loop.index) }} = {
+	{{- func.macro_loop_functions(trace,name,vtable_class_detail['virtuals'],'virtuals',mode='assign',abstract_name=vtable_class_name,postfix=func_postfix) }}
+};
+{# end parent ops #}
+	{%- endfor -%}
+{%- endfor -%}
+{%- endif -%}{%- endblock -%}
+
+{%- block private_class_init -%}
+	{{- func.macro_loop_functions(trace,name,inits,'inits',scope='private',mode='undeclare-init-private') -}}
+{%- endblock -%}
+
+{# init implement #}
+{%- block class_init -%}
+{%- call(init_index,pseudocode) func.macro_loop_functions(trace,name,inits,'inits',mode='impl-init') %}
+{
+	{% if not trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ name }}_init({% if init_index > 1 %}{{ init_index }}{% endif %})\n");
+	memset({{ name }}, sizeof(*{{ name }}), 0);
+	{%- if supers -%}
+		{%- for parent_name,parent_vtables in supers.iteritems() -%}
+			{%- set outer_loop = loop %}
+	{{ parent_name }}_init(&{{- name -}}->{{- parent_name -}}
+			{%- for setters_name,setters in supers_setter.iteritems() -%}
+				{%- if setters_name == parent_name -%}
+					{%- for setter in setters -%}
+						{%- if loop.index == outer_loop.index and setter.args -%}
+							, {{ setter.args -}}
+						{%- endif -%}
+					{%- endfor -%}
+				{%- endif -%}
+			{%- endfor -%}
+		);
+
+			{%- for vtable_class_name,vtable_class_detail in parent_vtables.iteritems() %}
+	{% if vtable_class_detail['_have_static_var'] -%}CLASS_OPS_INIT_SUPER_WITH_FIRST_STATIC
+	{%- elif vtable_class_detail['_have_super_ref'] -%}CLASS_OPS_INIT_SUPER
+	{%- else -%}CLASS_OPS_INIT
+	{%- endif -%}
+
+({{ name }}->{{ vtable_class_detail['path'] }}.ops, {{ fetch_ops_name(vtable_class_name, outer_loop.index, loop.index) }}
+
+				{%- if vtable_class_detail['_have_static_var'] -%}, {{ vtable_class_detail['_have_static_var'] }}{%- endif -%});
+			{%- endfor -%}
+		{%- endfor -%}
+	{%- endif -%}
+
+	{%- if _have_vtable_new %}
+	{{ name }}->ops = &{{ name }}_ops;
+	{%- endif %}
+
+	{%- for setters in inits_setter %}{% if loop.index == init_index -%}
+		{%- for k,v in setters.setters.iteritems() %}
+	{{ name }}->{{ k }} = {{ v }};
+		{%- endfor -%}
+	{%- endif -%}{%- endfor %}
+
+	{%- if pseudocode %}
+	/** PSEUDOCODE
+{{ pseudocode|indent(4, true) }}
+	*/
+	{%- endif %}
+}
+{%- endcall -%}
+{%- endblock -%}
+
+{%- block public_method -%}
+	{{- func.macro_loop_functions(trace,name,methods,'methods',mode='impl-print',scope='public') }}
+{%- endblock -%}
+

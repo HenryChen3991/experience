@@ -1,0 +1,10 @@
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/out_debug/builder/animal_builder_kitten.o: \
+ animal_builder_kitten.c \
+ /home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/myobj.h \
+ animal_builder_kitten.h animal_builder.h
+
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/myobj.h:
+
+animal_builder_kitten.h:
+
+animal_builder.h:

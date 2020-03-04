@@ -1,0 +1,14 @@
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/out_debug/builder/test.o: \
+ test.c \
+ /home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/test_suite.h \
+ kid.h animal_builder.h animal_builder_monkey.h animal_builder_kitten.h
+
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/test_suite.h:
+
+kid.h:
+
+animal_builder.h:
+
+animal_builder_monkey.h:
+
+animal_builder_kitten.h:

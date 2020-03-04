@@ -1,0 +1,328 @@
+{# function generate temple macro list
+ref:	{%- import '_macro.jinja' as func -%}
+#}
+{%- import '_common.jinja' as header -%}
+
+{# used as helper for format or split #}
+{%- set SPACE = ' ' -%}
+
+{# file header #}
+{%- macro file_header(file,copyright,author,date,summary,note) %}
+/**
+ * {{ file }}  {{ header.get_date(date) -}}
+   {{- header.get_author(author) }}
+ *
+   {{- header.get_copyright(copyright) }}
+ *
+   {{- header.get_summary(summary) }}
+{%- if note %} *
+ * {{ header.get_note(note) }}{%- endif %}
+ */
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_return_value(args) -%}
+	{%- if args.func_rtn_type[-1] == '*' %}
+	return 0;
+	{%- elif args.func_rtn_type == 'char *' %}
+	return 0;
+	{%- elif args.func_rtn_type == 'int' %}
+	return 0;
+	{%- endif -%}
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_impl_as_ops(args) %}
+	{% if args.func_rtn_type != 'void' -%}return{{ SPACE }}{%- endif -%}
+	{{- args.name }}->ops->{{ args.func -}}({{- args.name -}}
+		{%- if args.func_args %}, {{ args.func_args }}{%- endif -%}
+	);
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_impl_as_printf(args) -%}
+	{%- set l_have_return = [] -%}
+
+	{# destructor #}
+	{%- if args.func == '_destructor' %}
+	TODO(Please add our **destructor** code here ...)
+		{%- if args.abstract_path %}
+	/** PSEUDOCODE
+	... do_something() to put resources ...
+	{% if not args.trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ args.name }}::{{ args.func ~ args.func_postfix }}()\n");
+	CLASS_SUPER({{- args.first_arg_type -}}, _destructor);
+	*/
+		{%- else %}
+	{% if not args.trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ args.name }}::{{ args.func ~ args.func_postfix }}()\n");
+		{%- endif -%}
+
+	{# free #}
+	{%- elif args.func == 'free' %}
+	TODO(Please add our **free** code here ...)
+		{%- if args.abstract_path %}
+	/** PSEUDOCODE
+	struct {{ args.name }} *a_{{ args.name }} = container_of({{- args.first_arg_type -}}
+		, typeof(*a_{{ args.name }}), {{ args.abstract_path }});
+	{{ args.first_arg_type }}__destructor({{- args.first_arg_type -}});
+	{% if not args.trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ args.name }}::{{ args.func ~ args.func_postfix }}()\n");
+	free(a_{{ args.name }});
+	*/
+		{%- else %}
+	/** PSEUDOCODE
+	{{ args.first_arg_type }}__destructor({{- args.first_arg_type -}});
+	{% if not args.trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ args.name }}::{{ args.func ~ args.func_postfix }}()\n");
+	free({{ args.first_arg_type }});
+	*/
+		{%- endif -%}
+
+
+	{# get_property #}
+	{%- elif args.func is startswith('get_') %}
+	{%- do l_have_return.append(1) %}
+	{% if not args.trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ args.name }}::{{ args.func ~ args.func_postfix }}()\n");
+
+		{%- if args.abstract_path %}
+	/*
+	struct {{ args.name }} *a_{{ args.name }} = container_of({{- args.first_arg_type -}}
+		, typeof(*a_{{ args.name }}), {{ args.abstract_path }});
+	return a_{{ args.name }}->{{ args.func|substr(3) }};
+	*/
+		{%- else %}
+	return {{ args.name }}->{{ args.func|substr(3) }};
+		{%- endif -%}
+
+
+	{# set_property #}
+	{%- elif args.func is startswith('set_') %}
+	{%- do l_have_return.append(1) %}
+	{% if not args.trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ args.name }}::{{ args.func ~ args.func_postfix }}()\n");
+
+		{%- if args.abstract_path %}
+	/*
+	struct {{ args.name }} *a_{{ args.name }} = container_of({{- args.first_arg_type -}}
+		, typeof(*a_{{ args.name }}), {{ args.abstract_path }});
+	a_{{ args.name }}->{{ args.func|substr(3) }} = {{ args.func|substr(4) }};
+	*/
+		{%- else %}
+	{{ args.name }}->{{ args.func|substr(3) }} = {{ args.func|substr(4) }};
+		{%- endif -%}
+
+
+	{# default #}
+	{%- else %}
+		{%- if args.abstract_path %}
+	/* struct {{ args.name }} *a_{{ args.name }} = container_of({{- args.first_arg_type -}}
+		, typeof(*a_{{ args.name }}), {{ args.abstract_path }});
+	*/
+		{%- endif %}
+	{% if not args.trace %}printf{% else %}_MY_TRACE_STR{% endif -%}
+	("{{ args.name }}::{{ args.func ~ args.func_postfix }}()\n");
+
+	{%- endif -%}
+
+	{# after functions: pseudocode, return #}
+	{%- if args.func_pseudocode %}
+	/** PSEUDOCODE
+		{{- args.func_pseudocode|indent(4, true) }}
+	*/
+	{%- endif -%}
+
+	{%- if not l_have_return -%}
+	{{ EMPTY }}{{ macro_function_return_value(args) }}
+	{%- endif -%}
+
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_impl(args) %}
+{% if args.func_comment %}/** {{ args.func_comment }} */{% endif %}
+{% if args.insert_qualifier %}{{ args.insert_qualifier }}{{- SPACE -}}{%- endif -%}
+{{- args.func_rtn_type }}{{- SPACE -}}
+{{- args.func_format_str|format(args.name,args.func ~ args.func_postfix) -}}
+(
+{%- set l_have_params = [] -%}
+
+{%- if args.func_is_static == 'False' -%}
+	{%- do l_have_params.append(1) -%}
+
+struct{{- SPACE -}}{{- args.first_arg_type -}}{{- SPACE -}}*{{- args.first_arg_type -}}
+{%- endif -%}
+
+{%- if args.func_params -%}
+	{%- do l_have_params.append(1) -%}
+
+	{%- if args.func_is_static == 'False' -%},{{- SPACE -}}{%- endif -%}
+	{{- args.func_params -}}
+{%- endif -%}
+
+{%- if not l_have_params -%}void{%- endif -%}
+)
+{
+{{- caller() }}
+}
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_declare_as_ops(args) %}
+	{{ args.func_rtn_type }} (*{{ args.func }})(struct {{ args.name }} *
+	{%- if args.func_params %}, {{ args.func_params }}{%- endif %});{% if args.func_comment %} /** {{ args.func_comment }} */{% endif %}
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_declare_as_func(args, comma) %}
+{% if args.func_comment %}/** {{ args.func_comment }} */{% endif %}
+{{ args.func_rtn_type }}{{- SPACE -}}
+{{- args.func_format_str|format(args.name,args.func ~ args.func_postfix) -}}
+(
+{%- set l_have_params = [] -%}
+
+{%- if args.func_is_static == 'False' -%}
+	{%- do l_have_params.append(1) -%}
+	struct{{- SPACE -}}{{- args.name }}{{- SPACE -}}*{{- args.name }}
+{%- endif -%}
+
+{%- if args.func_params -%}
+	{%- do l_have_params.append(1) -%}
+	{%- if args.func_is_static == 'False' -%},{{- SPACE -}}{%- endif -%}
+	{{- args.func_params -}}
+{%- endif -%}
+
+{%- if not l_have_params -%}void{%- endif -%}
+){{ comma }}
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_declare_as_init_private(args, define, is_empty) %}
+{% if args.func_comment %}/** {{ args.func_comment }} */{% endif %}
+{{ define }} {{ args.func_format_str|format(args.name,args.func ~ args.func_postfix) -}}
+{% if not is_empty %}(...) _Static_assert(0, "private constructor, cannot be called directly."){% endif %}
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_function_assign(args) %}
+	.{{ args.func }} = {{ args.func_format_str|format(args.name,args.func ~ args.func_postfix) }},
+{%- endmacro -%}
+
+
+{##################################}
+{%- macro macro_variable(args) %}
+	{{ args.func_rtn_type }} {{ args.func }}{{ args.func_params }};{% if args.func_comment %} /** {{ args.func_comment }} */{% endif %}
+{%- endmacro -%}
+
+
+{##################################}
+@name class name
+@functions forearch functions list
+@abstract_name 
+@scope [private|protected|public]
+@static [True|False]
+@qualifier static inline
+@mode implement as [ops|printf]
+#}
+{%- macro macro_loop_functions(trace,name,functions,category,mode,pure='None',static='None',scope='None',qualifier='',postfix='',format_str='None',abstract_name='',abstract_path='') -%}
+	{% set l_have_items = [] %}
+
+	{%- for func_is_pure,func_is_static,func_scope,func_rtn_type,func,func_params,func_args,func_comment,func_pseudocode in functions -%}
+
+	{%- if format_str == "None" -%}
+		{%- set format_str='%s_%s' -%}
+
+		{%- if category == "virtuals" -%}
+			{%- set format_str='%s_ops_%s' -%}
+		{%- endif -%}
+	{%- endif -%}
+
+	{%- set first_arg_type = name -%}
+	{%- if abstract_name -%}
+		{%- set first_arg_type = abstract_name -%}
+	{%- endif -%}
+
+	{%- if trace and (trace == 'True' or trace == 'true') -%}
+		{%- set trace = 'True' -%}
+	{%- else -%}
+		{%- set trace = '' -%}
+	{%- endif -%}
+
+	{# hack init function's name #}
+	{%- set new_func = func -%}
+	{% if category == 'inits' and new_func == name %}
+		{%- if loop.index == 1 -%}
+			{%- set new_func = "init" -%}
+		{%- else -%}
+			{%- set new_func = "init" ~ loop.index -%}
+		{%- endif -%}
+	{% endif %}
+
+	{%- set args={'name':name,  'abstract_path':abstract_path,
+		'first_arg_type':first_arg_type,
+		'category':category,
+		'req_pure':pure,    'req_static':static, 'req_scope':scope,
+		'insert_qualifier':qualifier,
+		'func_is_pure':func_is_pure, 'func_is_static':func_is_static,
+		'func_scope':func_scope,     'func_rtn_type':func_rtn_type,
+		'func':new_func,             'func_postfix':postfix,          'func_format_str':format_str,
+		'func_params':func_params,   'func_args':func_args,
+		'func_comment':func_comment, 'func_pseudocode':func_pseudocode,
+		'trace':trace,
+		} -%}
+
+	{%- if      (args.req_pure   == 'None' or args.func_is_pure   == args.req_pure  )
+			and (args.req_static == 'None' or args.func_is_static == args.req_static)
+			and (args.req_scope  == 'None' or args.func_scope     == args.req_scope ) -%}
+
+		{%- if mode == "var" -%}
+			{{- macro_variable(args) -}}
+		{%- elif mode == "declare" -%}
+			{%- if category == "virtuals" -%}{{- macro_function_declare_as_ops(args) -}}
+			{%- elif category == "methods" -%}{{- macro_function_declare_as_func(args, ';') -}}
+			{%- endif -%}
+		{%- elif mode == "declare-init" -%}
+			{{- macro_function_declare_as_func(args, ';') -}}
+		{%- elif mode == "declare-init-private" -%}
+			{{- macro_function_declare_as_init_private(args, '#define', false) -}}
+		{%- elif mode == "undeclare-init-private" -%}
+			{{- macro_function_declare_as_init_private(args, '#undef', true) -}}
+			{{- macro_function_declare_as_func(args, ';') -}}
+		{%- elif mode == "assign" -%}
+			{%- do l_have_items.append(1) -%}
+			{{- macro_function_assign(args) -}}
+		{%- elif mode == "impl-init" -%}
+			{{- macro_function_declare_as_func(args, caller(loop.index,args.func_pseudocode)) -}}
+		{%- elif mode == "impl-ops" -%}
+			{%- call macro_function_impl(args) -%}
+				{{- macro_function_impl_as_ops(args) -}}
+			{%- endcall -%}
+		{%- elif mode == "impl-print" -%}
+			{%- call macro_function_impl(args) -%}
+				{{- macro_function_impl_as_printf(args) -}}
+			{%- endcall -%}
+		{%- else -%}
+			TODO(autogen-template error: jinja template macro_loop_functions mode value invalid: {{ mode }})
+		{%- endif -%}
+
+	{%- endif -%}
+	{%- endfor -%}
+
+	{# pad empty if needed #}
+	{%- if not l_have_items %}
+		{%- if mode == "assign" -%}
+			0
+		{%- endif -%}
+	{%- endif -%}
+
+{%- endmacro -%}
+

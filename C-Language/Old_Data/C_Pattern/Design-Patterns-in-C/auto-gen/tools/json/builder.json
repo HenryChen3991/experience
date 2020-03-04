@@ -1,0 +1,49 @@
+{
+"file_note": "True",
+"namespace": "builder",
+"path":      "builder",
+
+"classes": {
+	"animal":{
+		"members": [
+			["virtual", "eat", "void"]
+		],
+
+		"inheritances": {
+			"kitten":{
+				"members": [ ["override",  "<ALL>"] ]
+			},
+			"monkey":{
+				"members": [ ["override",  "<ALL>"] ]
+			}
+		}
+	},
+
+	"animal_builder":{
+		"members": [
+			["virtual", "build_header",  "void"],
+			["virtual", "build_body"  ,  "void"],
+			["virtual", "build_leg"   ,  "void"],
+			["virtual", "build_arm"   ,  "void"],
+			["virtual", "build_tail"  ,  "void"]
+		],
+
+		"inheritances": {
+			"animal_builder_monkey":{
+				"members": [ ["override",  "<ALL>"] ]
+			},
+			"animal_builder_kitten":{
+				"members": [ ["override",  "<ALL>"] ]
+			}
+		}
+	},
+
+	"kid":{
+		"includes":["animal_builder"],
+		"members": [
+			["method", "make_animal", "void", "struct animal_builder *builder"],
+			["var", "name", "char", "[32]"]
+		]
+	}
+}
+}

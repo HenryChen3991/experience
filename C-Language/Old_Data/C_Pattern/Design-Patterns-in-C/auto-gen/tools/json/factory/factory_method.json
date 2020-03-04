@@ -1,0 +1,37 @@
+{
+"namespace":"factory_method",
+"path":"factory_method",
+"classes": {
+	"product":{
+		"members": [
+			["virtual",  "do_it","void", "int a, int b"],
+			["var",      "name", "char", "[32]"]
+		],
+
+		"inheritances": {
+			"concrete_product_1":{
+				"members": [ ["override", "<ALL>"] ]
+			},
+			"concrete_product_2":{
+				"members": [ ["override", "<ALL>"] ]
+			}
+		}
+	},
+
+	"factory":{
+		"members": [
+			["virtual", "create", "struct product *"],
+			["method",  "do_it",  "void" ]
+		],
+
+		"inheritances": {
+			"factory_product_1":{
+				"members": [ ["override", "<ALL>"] ]
+			},
+			"factory_product_2":{
+				"members": [ ["override", "<ALL>"] ]
+			}
+		}
+	}
+}
+}

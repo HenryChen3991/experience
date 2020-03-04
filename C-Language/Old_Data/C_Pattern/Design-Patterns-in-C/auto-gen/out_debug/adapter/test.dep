@@ -1,0 +1,12 @@
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/out_debug/adapter/test.o: \
+ test.c \
+ /home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/test_suite.h \
+ adapter.h adaptee.h target.h
+
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/test_suite.h:
+
+adapter.h:
+
+adaptee.h:
+
+target.h:

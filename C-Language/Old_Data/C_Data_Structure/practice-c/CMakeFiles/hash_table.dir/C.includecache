@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/hash_table.c
+
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/hash_table.h
+stdbool.h
+-
+stdio.h
+-
+stdlib.h
+-
+assert.h
+-
+string.h
+-
+
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/main.c
+hash_table.h
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/hash_table.h
+hash_table.c
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/hash_table.c
+tests.h
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/tests.h
+tests.c
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/tests.c
+
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/tests.c
+
+/home/disk_D/henry03/cTest/C_Data_Structure/practice-c/hash_table/tests.h
+assert.h
+-
+

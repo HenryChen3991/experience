@@ -1,0 +1,4 @@
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/out_debug/builder/animal_builder.o: \
+ animal_builder.c animal_builder.h
+
+animal_builder.h:

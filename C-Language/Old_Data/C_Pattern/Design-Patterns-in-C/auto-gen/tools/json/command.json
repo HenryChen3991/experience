@@ -1,0 +1,66 @@
+{
+"file_note":"True",
+"trace":    "True",
+"summary":  "",
+"note":     """
+<br>Need to issue requests to objects without knowing anything about the operation being requested or the receiver of the request.
+<br>    Encapsulate a request as an object, thereby letting you parameterize clients with different requests, queue or log requests, and support undoable operations.
+<br>    Promote \"invocation of a method on an object\" to full object status
+<br>    An object-oriented callback
+""",
+
+"classes": {
+	"light":{
+		"comment":"",
+		"includes":[],
+		"members": [
+			["method", "turnon",  "void",],
+			["method", "turnoff", "void",],
+		],
+	},
+
+	"switcher":{
+		"comment":"",
+		"includes":[],
+		"members": [
+			["method", "append",  "void", "struct command *cmd"],
+			["method", "execute",  "void",],
+
+			["var", "_commands_sz", "int",],
+			["var", "_commands", "struct command *", "[32]"],
+		],
+	},
+
+	"command":{
+		"comment":"",
+		"includes":[],
+		"members": [
+			["pure_virtual", "execute",  "void"],
+		],
+
+		"inheritances": {
+			"flipup, flipdown":{
+				"includes":["light"],
+				"members": [
+					["override",  "<ALL>"],
+					["init",  "init", "void", "struct light *light, int val"],
+
+					["var",  "_light", "struct light *"],
+					["var",  "_val", "int"],
+				],
+			},
+		},
+	},
+
+	"test":{
+		"templates":["_test"],
+		"includes":["flipup", "flipdown", "light", "switcher"],
+		"members": [
+			["static_method", "main", "int", "", "private", "", """
+				<br>printf(\"Hello world\");
+			"""
+			],
+		],
+	}
+}
+}

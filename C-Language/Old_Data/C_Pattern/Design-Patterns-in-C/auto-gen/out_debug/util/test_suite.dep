@@ -1,0 +1,8 @@
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/out_debug/util/test_suite.o: \
+ test_suite.c \
+ /home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/ulist.h \
+ test_suite.h
+
+/home/disk_D/henry03/cTest/C_Pattern/Design-Patterns-in-C/auto-gen/util/ulist.h:
+
+test_suite.h:
