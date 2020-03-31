@@ -1,0 +1,812 @@
+From 8879574408c2e1e60651043649a7c85de030a306 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Wed, 27 Mar 2019 11:07:34 +0800
+Subject: [PATCH 11/38] [i2c-tools] Support i2cget/i2cset to use nokia_RI
+ parameter format
+
+[Description]
+    1.support using "i2cget/i2cset [-G parm value]" to get/set.
+    2.now, i2cset only support "HardwareVersion","ProgDate",
+      and "MACAddress" three types.
+
+[Peer Review]
+    Matthew
+
+[Unit Test]
+    1.build success.
+    2.check "i2cget -G parm" whether work.
+    3.check "i2cset -G parm value" whether work.
+
+Change-Id: Ice8fce35a7fd0b3c82699e0886b0171a4a42e9de
+---
+ userspace/private/apps/i2c-tools/tools/i2cget.c | 144 +++++++++-----
+ userspace/private/apps/i2c-tools/tools/i2cset.c | 249 ++++++++++++++----------
+ userspace/private/apps/i2c-tools/tools/util.c   | 208 ++++++++++++++++++++
+ userspace/private/apps/i2c-tools/tools/util.h   |  21 ++
+ 4 files changed, 465 insertions(+), 157 deletions(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cget.c b/userspace/private/apps/i2c-tools/tools/i2cget.c
+index c47a43b..1f40acd 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cget.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cget.c
+@@ -40,7 +40,9 @@ static void help(void)
+ {
+     fprintf(stderr,
+ //ifdef ODM_GEMTEK
+-            "Usage: i2cget [-f] [-y] [-t delay(ms)] I2CBUS CHIP-ADDRESS [ DATA-ADDRESS [ MODE [LENGTH] ] ]\n"
++            "Usage:\n"
++            "  1. i2cget [-f] [-y] [-t delay(ms)] I2CBUS CHIP-ADDRESS [ DATA-ADDRESS [ MODE [LENGTH] ] ]\n"
++            "  2. i2cget [-G parm]\n"
+ //#else
+ //            "Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]\n"
+ //#endif //ODM_GEMTEK
+@@ -54,6 +56,9 @@ static void help(void)
+             "    g [LENGTH] (GEMTEK mode,length default is 1)\n"
+ //#endif //ODM_GEMTEK
+             "    Append p for SMBus PEC\n");
++//#ifdef ODM_GEMTEK
++    print_all_support_parm();
++//#endif //ODM_GEMTEK
+     exit(1);
+ }
+ 
+@@ -172,6 +177,8 @@ int main(int argc, char *argv[])
+ //#ifdef ODM_GEMTEK
+     int gtk_mode = 0;
+     int delay = 10000; //10ms
++    char parm[E2PROM_PARM_LEN] = {0};
++    int e2prom_parm_index = -1;
+ //#endif //ODM_GEMTEK
+ 
+     /* handle (optional) flags first */
+@@ -194,6 +201,13 @@ int main(int argc, char *argv[])
+                     fprintf(stderr, "WARNING: delay <= 0 will casue reading failed problem, and suggest set 10 ms or use default value\n");
+                 flags++;
+                 break;
++            case 'G':
++                force = 1;
++                yes = 1;
++                gtk_mode = 2;
++                strncpy(parm,argv[2+flags],sizeof(parm));
++                flags++;
++                break;
+ //#endif //ODM_GEMTEK
+             default:
+                 fprintf(stderr, "Error: Unsupported option "
+@@ -204,59 +218,77 @@ int main(int argc, char *argv[])
+         flags++;
+     }
+ 
+-    if (version) {
+-        fprintf(stderr, "i2cget version %s\n", VERSION);
+-        exit(0);
++//#ifdef ODM_GEMTEK
++    if(gtk_mode==2){
++        if( (e2prom_parm_index = find_nokia_RI_entry(parm)) < 0){
++            fprintf(stderr,"Not support parm : %s\n",parm);
++            print_all_support_parm();
++            exit(1);
++        }
++        i2cbus = lookup_i2c_bus("0");
++        if(!strncmp(parm,"RollbackFlag",E2PROM_PARM_LEN))
++            address = parse_i2c_address("0x57");
++        else
++            address = parse_i2c_address("0x56");
++        size = I2C_SMBUS_BYTE_DATA;
++        daddress = nokia_ri[e2prom_parm_index].initialAddr;
+     }
++    else{
++//#endif //ODM_GEMTEK
++        if (version) {
++            fprintf(stderr, "i2cget version %s\n", VERSION);
++            exit(0);
++        }
+ 
+-    if (argc < flags + 3)
+-        help();
+-
+-    i2cbus = lookup_i2c_bus(argv[flags+1]);
+-    if (i2cbus < 0)
+-        help();
++        if (argc < flags + 3)
++            help();
+ 
+-    address = parse_i2c_address(argv[flags+2]);
+-    if (address < 0)
+-        help();
++        i2cbus = lookup_i2c_bus(argv[flags+1]);
++        if (i2cbus < 0)
++            help();
+ 
+-    if (argc > flags + 3) {
+-        size = I2C_SMBUS_BYTE_DATA;
+-        daddress = strtol(argv[flags+3], &end, 0);
+-        if (*end || daddress < 0 || daddress > 0xff) {
+-            fprintf(stderr, "Error: Data address invalid!\n");
++        address = parse_i2c_address(argv[flags+2]);
++        if (address < 0)
+             help();
++
++        if (argc > flags + 3) {
++            size = I2C_SMBUS_BYTE_DATA;
++            daddress = strtol(argv[flags+3], &end, 0);
++            if (*end || daddress < 0 || daddress > 0xff) {
++                fprintf(stderr, "Error: Data address invalid!\n");
++                help();
++            }
++        }
++        else {
++            size = I2C_SMBUS_BYTE;
++            daddress = -1;
+         }
+-    }
+-    else {
+-        size = I2C_SMBUS_BYTE;
+-        daddress = -1;
+-    }
+ 
+-    if (argc > flags + 4) {
+-        switch (argv[flags+4][0]) {
+-            case 'b':
+-                size = I2C_SMBUS_BYTE_DATA;
+-                break;
+-            case 'w':
+-                size = I2C_SMBUS_WORD_DATA;
+-                break;
+-            case 'c':
+-                size = I2C_SMBUS_BYTE;
+-                break;
++        if (argc > flags + 4) {
++            switch (argv[flags+4][0]) {
++                case 'b':
++                    size = I2C_SMBUS_BYTE_DATA;
++                    break;
++                case 'w':
++                    size = I2C_SMBUS_WORD_DATA;
++                    break;
++                case 'c':
++                    size = I2C_SMBUS_BYTE;
++                    break;
+ //#ifdef ODM_GEMTEK
+-            case 'g':
+-                gtk_mode = 1;
+-                break;
++                case 'g':
++                    gtk_mode = 1;
++                    break;
+ //#endif //ODM_GEMTEK
+-            default:
+-                fprintf(stderr, "Error: Invalid mode!\n");
+-                help();
++                default:
++                    fprintf(stderr, "Error: Invalid mode!\n");
++                    help();
++            }
++            pec = argv[flags+4][1] == 'p';
+         }
+-        pec = argv[flags+4][1] == 'p';
++//#ifdef ODM_GEMTEK
+     }
+ 
+-//#ifdef ODM_GEMTEK
+     int gtk_len = 1;
+     if(gtk_mode == 1) {
+         if (argc > flags + 5) {
+@@ -267,6 +299,10 @@ int main(int argc, char *argv[])
+             }
+         }
+     }
++    else if(gtk_mode ==2){
++        gtk_len = nokia_ri[e2prom_parm_index].length;
++    }
++
+     unsigned char gtk_block[32]= {0};
+     int stored_length = 0;
+     do {
+@@ -320,18 +356,20 @@ int main(int argc, char *argv[])
+ //#endif //ODM_GEMTEK
+ 
+ //#ifdef ODM_GEMTEK
+-    }
+-    while(gtk_len!=0);
++    } while(gtk_len!=0);
++
+     int i=0;
+-    printf("HEX:\n");
+-    for(i=0; i<stored_length; i++)
+-        printf("0x%0*x ", size == I2C_SMBUS_WORD_DATA ? 4 : 2, gtk_block[i]);
+-    printf("\nASCII:\n");
+-    for(i=0; i<stored_length; i++){
+-        if( gtk_block[i] > 0x1F && gtk_block[i] < 0x7F )
+-            printf("%c",gtk_block[i]);
+-        else
+-            printf(" ");
++    if(nokia_ri[e2prom_parm_index].printMode == HEX_MODE){
++        for(i=0; i<stored_length; i++)
++            printf("0x%0*x ", size == I2C_SMBUS_WORD_DATA ? 4 : 2, gtk_block[i]);
++    }
++    else if(nokia_ri[e2prom_parm_index].printMode == CHARACTER_MODE){
++        for(i=0; i<stored_length; i++){
++            if( gtk_block[i] > 0x1F && gtk_block[i] < 0x7F )
++                printf("%c",gtk_block[i]);
++            else
++                printf(" ");
++        }
+     }
+     printf("\n");
+ //#endif //ODM_GEMTEK
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cset.c b/userspace/private/apps/i2c-tools/tools/i2cset.c
+index 63a53dc..4f72e96 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cset.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cset.c
+@@ -37,7 +37,9 @@ static void help(void)
+ {
+     fprintf(stderr,
+ //#ifdef ODM_GEMTEK
+-            "Usage: i2cset [-f] [-y] [-m MASK] [-t delay(ms)] [-r] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]\n"
++            "Usage:\n"
++            "   1.i2cset [-f] [-y] [-m MASK] [-t delay(ms)] [-r] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]\n"
++            "   2.i2cset [-G parm value]\n"
+ //#else
+ //            "Usage: i2cset [-f] [-y] [-m MASK] [-r] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]\n"
+ //#endif //ODM_GEMTEK
+@@ -173,9 +175,14 @@ int main(int argc, char *argv[])
+     int flags = 0;
+     int force = 0, yes = 0, version = 0, readback = 0;
+     unsigned char block[I2C_SMBUS_BLOCK_MAX];
+-    int len;
+ //#ifdef ODM_GEMTEK
++    int len = 0;
++    int e2prom_parm_index = -1;
+     int delay = 10000;  //10ms
++    int gtk_mode = 0;   //mode 2 for "i2cset -G parm" using
++    char parm[E2PROM_PARM_LEN] = {0};
++//#else
++//    int len;
+ //#endif //ODM_GEMTKE
+ 
+     /* handle (optional) flags first */
+@@ -195,6 +202,7 @@ int main(int argc, char *argv[])
+                     maskp = argv[2+flags];
+                 flags++;
+                 break;
++//#ifdef ODM_GEMTEK
+             case 't':
+                 if (2+flags < argc)
+                    delay = strtol(argv[2+flags],NULL,10)*1000;
+@@ -202,6 +210,14 @@ int main(int argc, char *argv[])
+                    fprintf(stderr, "WARNING: delay <= 0 will casue writing failed problem, and suggest set 10 ms or use default value\n");
+                 flags++;
+                 break;
++           case 'G':
++                force = 1;
++                yes = 1;
++                gtk_mode = 2;
++                strncpy(parm,argv[2+flags],sizeof(parm));
++                flags++;
++                break;
++//#endif //ODM_GEMTEK
+             case 'r':
+                 readback = 1;
+                 break;
+@@ -218,137 +234,162 @@ int main(int argc, char *argv[])
+         fprintf(stderr, "i2cset version %s\n", VERSION);
+         exit(0);
+     }
++//#ifdef ODM_GEMTEK
++    if(gtk_mode == 2){
++        if( (e2prom_parm_index = find_nokia_RI_entry(parm)) < 0){
++            fprintf(stderr,"Not support parm : %s\n",parm);
++            print_all_support_parm();
++            exit(1);
++        }
+ 
+-    if (argc < flags + 4)
+-        help();
+-
+-    i2cbus = lookup_i2c_bus(argv[flags+1]);
+-    if (i2cbus < 0)
+-        help();
++        if( nokia_ri[e2prom_parm_index].set == NULL ){
++            fprintf(stderr,"parm : %s not support setting feature in this mode\n",parm);
++        }
+ 
+-    address = parse_i2c_address(argv[flags+2]);
+-    if (address < 0)
+-        help();
++        i2cbus = lookup_i2c_bus("0");
++        if(!strncmp(parm,"RollbackFlag",E2PROM_PARM_LEN))
++            address = parse_i2c_address("0x57");
++        else
++            address = parse_i2c_address("0x56");
++        size = I2C_SMBUS_I2C_BLOCK_DATA;
++        daddress = nokia_ri[e2prom_parm_index].initialAddr;
+ 
+-    daddress = strtol(argv[flags+3], &end, 0);
+-    if (*end || daddress < 0 || daddress > 0xff) {
+-        fprintf(stderr, "Error: Data address invalid!\n");
+-        help();
++        nokia_ri[e2prom_parm_index].set(&argv[3][0],block,&len);
+     }
++    else{
++//#endif //ODM_GEMTEK
+ 
+-    /* check for command/mode */
+-    if (argc == flags + 4) {
+-        /* Implicit "c" */
+-        size = I2C_SMBUS_BYTE;
+-    }
+-    else if (argc == flags + 5) {
+-        /* "c", "cp",  or implicit "b" */
+-        if (!strcmp(argv[flags+4], "c")
+-                || !strcmp(argv[flags+4], "cp")) {
+-            size = I2C_SMBUS_BYTE;
+-            pec = argv[flags+4][1] == 'p';
+-        }
+-        else {
+-            size = I2C_SMBUS_BYTE_DATA;
+-        }
+-    }
+-    else {
+-        /* All other commands */
+-        if (strlen(argv[argc-1]) > 2
+-                || (strlen(argv[argc-1]) == 2 && argv[argc-1][1] != 'p')) {
+-            fprintf(stderr, "Error: Invalid mode '%s'!\n", argv[argc-1]);
++        if (argc < flags + 4)
++            help();
++
++        i2cbus = lookup_i2c_bus(argv[flags+1]);
++        if (i2cbus < 0)
++            help();
++
++        address = parse_i2c_address(argv[flags+2]);
++        if (address < 0)
+             help();
++
++        daddress = strtol(argv[flags+3], &end, 0);
++        if (*end || daddress < 0 || daddress > 0xff) {
++            fprintf(stderr, "Error: Data address invalid!\n");
++	    help();
++        }
++
++        /* check for command/mode */
++        if (argc == flags + 4) {
++            /* Implicit "c" */
++            size = I2C_SMBUS_BYTE;
+         }
+-        switch (argv[argc-1][0]) {
+-            case 'b':
++        else if (argc == flags + 5) {
++            /* "c", "cp",  or implicit "b" */
++            if (!strcmp(argv[flags+4], "c")
++                    || !strcmp(argv[flags+4], "cp")) {
++                size = I2C_SMBUS_BYTE;
++                pec = argv[flags+4][1] == 'p';
++            }
++            else {
+                 size = I2C_SMBUS_BYTE_DATA;
+-                break;
+-            case 'w':
+-                size = I2C_SMBUS_WORD_DATA;
+-                break;
+-            case 's':
+-                size = I2C_SMBUS_BLOCK_DATA;
+-                break;
+-            case 'i':
+-                size = I2C_SMBUS_I2C_BLOCK_DATA;
+-                break;
+-            default:
+-                fprintf(stderr, "Error: Invalid mode '%s'!\n", argv[argc-1]);
+-                help();
++            }
+         }
+-        pec = argv[argc-1][1] == 'p';
+-        if (size == I2C_SMBUS_BLOCK_DATA || size == I2C_SMBUS_I2C_BLOCK_DATA) {
+-            if (pec && size == I2C_SMBUS_I2C_BLOCK_DATA) {
+-                fprintf(stderr, "Error: PEC not supported for I2C block writes!\n");
++        else {
++            /* All other commands */
++            if (strlen(argv[argc-1]) > 2
++                    || (strlen(argv[argc-1]) == 2 && argv[argc-1][1] != 'p')) {
++                fprintf(stderr, "Error: Invalid mode '%s'!\n", argv[argc-1]);
+                 help();
+             }
+-            if (maskp) {
+-                fprintf(stderr, "Error: Mask not supported for block writes!\n");
+-                help();
++            switch (argv[argc-1][0]) {
++                case 'b':
++                    size = I2C_SMBUS_BYTE_DATA;
++                    break;
++                case 'w':
++                    size = I2C_SMBUS_WORD_DATA;
++                    break;
++                case 's':
++                    size = I2C_SMBUS_BLOCK_DATA;
++                    break;
++                case 'i':
++                    size = I2C_SMBUS_I2C_BLOCK_DATA;
++                    break;
++                default:
++                    fprintf(stderr, "Error: Invalid mode '%s'!\n", argv[argc-1]);
++                    help();
+             }
+-            if (argc > (int)sizeof(block) + flags + 5) {
++            pec = argv[argc-1][1] == 'p';
++            if (size == I2C_SMBUS_BLOCK_DATA || size == I2C_SMBUS_I2C_BLOCK_DATA) {
++                if (pec && size == I2C_SMBUS_I2C_BLOCK_DATA) {
++                    fprintf(stderr, "Error: PEC not supported for I2C block writes!\n");
++                    help();
++                }
++                if (maskp) {
++                    fprintf(stderr, "Error: Mask not supported for block writes!\n");
++                    help();
++                }
++                if (argc > (int)sizeof(block) + flags + 5) {
++                    fprintf(stderr, "Error: Too many arguments!\n");
++                    help();
++                }
++            }
++            else if (argc != flags + 6) {
+                 fprintf(stderr, "Error: Too many arguments!\n");
+                 help();
+             }
+         }
+-        else if (argc != flags + 6) {
+-            fprintf(stderr, "Error: Too many arguments!\n");
+-            help();
+-        }
+-    }
+ 
+-    len = 0; /* Must always initialize len since it is passed to confirm() */
++        len = 0; /* Must always initialize len since it is passed to confirm() */
+ 
+-    /* read values from command line */
+-    switch (size) {
+-        case I2C_SMBUS_BYTE_DATA:
+-        case I2C_SMBUS_WORD_DATA:
+-            value = strtol(argv[flags+4], &end, 0);
+-            if (*end || value < 0) {
+-                fprintf(stderr, "Error: Data value invalid!\n");
+-                help();
+-            }
+-            if ((size == I2C_SMBUS_BYTE_DATA && value > 0xff)
+-                    || (size == I2C_SMBUS_WORD_DATA && value > 0xffff)) {
+-                fprintf(stderr, "Error: Data value out of range!\n");
+-                help();
+-            }
+-            break;
+-        case I2C_SMBUS_BLOCK_DATA:
+-        case I2C_SMBUS_I2C_BLOCK_DATA:
+-            for (len = 0; len + flags + 5 < argc; len++) {
+-                value = strtol(argv[flags + len + 4], &end, 0);
++        /* read values from command line */
++        switch (size) {
++            case I2C_SMBUS_BYTE_DATA:
++            case I2C_SMBUS_WORD_DATA:
++                value = strtol(argv[flags+4], &end, 0);
+                 if (*end || value < 0) {
+                     fprintf(stderr, "Error: Data value invalid!\n");
+                     help();
+                 }
+-                if (value > 0xff) {
++                if ((size == I2C_SMBUS_BYTE_DATA && value > 0xff)
++                        || (size == I2C_SMBUS_WORD_DATA && value > 0xffff)) {
+                     fprintf(stderr, "Error: Data value out of range!\n");
+                     help();
+                 }
+-                block[len] = value;
+-            }
+-            value = -1;
+-            break;
+-        default:
+-            value = -1;
+-            break;
+-    }
+-
+-    if (maskp) {
+-        vmask = strtol(maskp, &end, 0);
+-        if (*end || vmask == 0) {
+-            fprintf(stderr, "Error: Data value mask invalid!\n");
+-            help();
++                break;
++            case I2C_SMBUS_BLOCK_DATA:
++            case I2C_SMBUS_I2C_BLOCK_DATA:
++                for (len = 0; len + flags + 5 < argc; len++) {
++                    value = strtol(argv[flags + len + 4], &end, 0);
++                    if (*end || value < 0) {
++                        fprintf(stderr, "Error: Data value invalid!\n");
++                        help();
++                    }
++                    if (value > 0xff) {
++                        fprintf(stderr, "Error: Data value out of range!\n");
++                        help();
++                    }
++                    block[len] = value;
++                }
++                value = -1;
++                break;
++            default:
++                value = -1;
++                break;
+         }
+-        if (((size == I2C_SMBUS_BYTE || size == I2C_SMBUS_BYTE_DATA)
+-                && vmask > 0xff) || vmask > 0xffff) {
+-            fprintf(stderr, "Error: Data value mask out of range!\n");
+-            help();
++
++        if (maskp) {
++            vmask = strtol(maskp, &end, 0);
++            if (*end || vmask == 0) {
++                fprintf(stderr, "Error: Data value mask invalid!\n");
++                help();
++            }
++            if (((size == I2C_SMBUS_BYTE || size == I2C_SMBUS_BYTE_DATA)
++                    && vmask > 0xff) || vmask > 0xffff) {
++                fprintf(stderr, "Error: Data value mask out of range!\n");
++                help();
++            }
+         }
++//#ifdef ODM_GEMTEK
+     }
+ 
+-//#ifdef ODM_GEMTEK
+     unsigned char gtk_block[32] = {0};
+     int gtk_addr = daddress;
+     int total = len;
+diff --git a/userspace/private/apps/i2c-tools/tools/util.c b/userspace/private/apps/i2c-tools/tools/util.c
+index 34968f7..73fb76d 100644
+--- a/userspace/private/apps/i2c-tools/tools/util.c
++++ b/userspace/private/apps/i2c-tools/tools/util.c
+@@ -19,6 +19,10 @@
+ */
+ 
+ #include <stdio.h>
++//#ifdef ODM_GEMTEK
++#include <stdlib.h>
++#include <string.h>
++//#endif //ODM_GEMTEK
+ #include "util.h"
+ 
+ /* Return 1 if we should continue, 0 if we should abort */
+@@ -56,3 +60,207 @@ int user_ack(int def)
+     return ret;
+ }
+ 
++//#ifdef ODM_GEMTEK
++void set_MACAddress(char *,char *,int *);
++void set_MACAddress_help(void);
++int parse_mac_addr(char *);
++void set_ProgDate(char*,char *,int*);
++void set_ProgDate_help(void);
++int parse_prog_date(char *);
++void set_HardwareVersion(char *,char *,int *);
++int parse_hardware_version(char *);
++void set_HardwareVersion_help(void);
++
++#define MAC_ADDRESS_LEN        6
++#define MAC_STR_ADDRESS_LEN   17
++#define PROG_DATA_LEN          6
++#define HARDWARE_VERSION_LEN  12
++
++E2PROM_DATA_MAP nokia_ri[] = {
++    {"Format"            ,0x0   ,2  ,CHARACTER_MODE   ,NULL},//0x56 i2c-device (256 bytes)
++    {"MfrID"             ,0x2   ,4  ,CHARACTER_MODE   ,NULL},
++    {"FactoryCode"       ,0x6   ,2  ,CHARACTER_MODE   ,NULL},
++    {"HardwareVersion"   ,0x8   ,12 ,CHARACTER_MODE   ,set_HardwareVersion},
++    {"ICS"               ,0x14  ,2  ,CHARACTER_MODE   ,NULL},
++    {"YPSerialNum"       ,0x16  ,16 ,CHARACTER_MODE   ,NULL},//0x20 *8 ,0x30 *8
++    {"CleiCode"          ,0x26  ,10 ,CHARACTER_MODE   ,NULL},
++    {"Mnemonic"          ,0x30  ,8  ,CHARACTER_MODE   ,NULL},
++    {"ProgDate"          ,0x38  ,6  ,CHARACTER_MODE   ,set_ProgDate},
++    {"MACAddress"        ,0x3e  ,6  ,HEX_MODE         ,set_MACAddress},
++    {"DeviceIDPref"      ,0x44  ,2  ,HEX_MODE         ,NULL},
++    {"SWImage"           ,0x46  ,2  ,HEX_MODE         ,NULL},
++    {"OnuMOde"           ,0x48  ,2  ,HEX_MODE         ,NULL},//unknown
++    {"Mnemonic2"         ,0x4a  ,4  ,CHARACTER_MODE   ,NULL},//unknown, ref on Mnemonic
++    {"Password"          ,0x4e  ,10 ,HEX_MODE         ,NULL},
++    {"G984Serial"        ,0x58  ,4  ,HEX_MODE         ,NULL},
++    {"HWConfiguration"   ,0x5c  ,8  ,HEX_MODE         ,NULL},
++    {"PartNumber"        ,0x64  ,10 ,CHARACTER_MODE   ,NULL},
++    {"Variant"           ,0x6e  ,2  ,CHARACTER_MODE   ,NULL},
++    {"Spare4"            ,0x70  ,12 ,HEX_MODE         ,NULL},
++    {"Checksum"          ,0x7c  ,2  ,HEX_MODE         ,NULL},
++    {"InserviceReg"      ,0x7e  ,2  ,HEX_MODE         ,NULL},
++    {"UserNmae"          ,0x80  ,16 ,CHARACTER_MODE   ,NULL},//*
++    {"UserPassword"      ,0x90  ,8  ,CHARACTER_MODE   ,NULL},//*
++    {"MgntUserName"      ,0x98  ,16 ,CHARACTER_MODE   ,NULL},//*
++    {"MgntUserPasswrod"  ,0xA8  ,8  ,CHARACTER_MODE   ,NULL},//*
++    {"SSID_1_Name"       ,0xB0  ,16 ,CHARACTER_MODE   ,NULL},
++    {"SSID_1_Password"   ,0xC0  ,8  ,CHARACTER_MODE   ,NULL},
++    {"SSID_2_Name"       ,0xC8  ,16 ,CHARACTER_MODE   ,NULL},
++    {"SSID_2_Password"   ,0xD8  ,8  ,CHARACTER_MODE   ,NULL},
++    {"OperatorID"        ,0xE0  ,4  ,CHARACTER_MODE   ,NULL},
++    {"SLID"              ,0xE4  ,16 ,HEX_MODE         ,NULL},
++    {"CountryID"         ,0xF4  ,2  ,CHARACTER_MODE   ,NULL},
++    {"GroupID"           ,0xF6  ,4  ,HEX_MODE         ,NULL},//unknown
++    {"Spare5"            ,0xFA  ,2  ,HEX_MODE         ,NULL},
++    {"Checksum1"         ,0xFC  ,2  ,HEX_MODE         ,NULL},
++    {"Spare6"            ,0xFE  ,2  ,HEX_MODE         ,NULL},
++    {"RollbackFlag"      ,0x0   ,2  ,HEX_MODE         ,NULL},//0x57 i2c-device
++};
++
++int get_e2prom_data_map_length(void){
++    return (sizeof(nokia_ri)/sizeof(E2PROM_DATA_MAP));
++}
++
++void print_all_support_parm(void){
++    int e2prom_data_len = get_e2prom_data_map_length();
++    int i = 0;
++    printf("Support parm:\n");
++    for(i = 0 ; i < e2prom_data_len ; i++){
++        printf("%16s\t",nokia_ri[i].parm);
++        if( (i+1)%4==0 || i==(e2prom_data_len-1) )
++            printf("\n");
++    }
++}
++
++int find_nokia_RI_entry(char *parm){
++    int e2prom_data_len = get_e2prom_data_map_length();
++    int i = 0;
++    int ret = RET_FAILED;
++    for(i = 0; i < e2prom_data_len ;i++){
++        if(!strncmp(nokia_ri[i].parm,parm,E2PROM_PARM_LEN)) {
++            ret = i;
++            break;
++        }
++    }
++    return ret;
++}
++void set_MACAddress_help(void){
++    fprintf(stderr,"MACAddress not invalid\n"
++        "Please match the following format: 30:31:32:33:34:35\n");
++    exit(1);
++}
++
++int parse_mac_addr(char *str){
++    int ret = RET_FAILED;
++    int i = 0;
++    while( *str && i < MAC_STR_ADDRESS_LEN){
++       if( (i%3)==2 ){
++           if( *str != ':')
++               return RET_FAILED;
++       }
++       else{
++           if((*str >= '0') && (*str <= '9'))      ret = RET_SUCCESS;
++           else if((*str >= 'a') && (*str <= 'f')) ret = RET_SUCCESS;
++           else if((*str >= 'A') && (*str <= 'F')) ret = RET_SUCCESS;
++           else{
++               return RET_FAILED;
++           }
++       }
++       str++;
++       i++;
++    }
++    return ret;
++}
++
++void set_ProgDate_help(void){
++    fprintf(stderr,"ProgDate not invalid\n"
++        "Please match the following format: 160101\n");
++    exit(1);
++}
++
++
++void set_MACAddress(char *data,char *block,int *len){
++   int i = 0;
++   unsigned char mac[MAC_ADDRESS_LEN] = {0};
++
++   if( data==NULL || strlen(data)!=MAC_STR_ADDRESS_LEN ){
++       set_MACAddress_help();
++   }
++   else{
++       if(parse_mac_addr(data) == RET_SUCCESS){
++           sscanf(data,"%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",&mac[0],&mac[1],&mac[2],&mac[3],&mac[4],&mac[5]);
++           for(i = 0 ; i < MAC_ADDRESS_LEN ; i++){
++               block[i] = mac[i];
++           }
++           *len = MAC_ADDRESS_LEN;
++       }
++       else
++           set_MACAddress_help();
++   }
++}
++
++int parse_prog_date(char *str){
++    int ret = RET_FAILED;
++    while( *str ){
++        if((*str >= '0') && (*str <= '9'))    ret = RET_SUCCESS;
++        else
++            return RET_FAILED;
++        str++;
++    }
++    return ret;
++}
++
++void set_ProgDate(char *data,char *block,int *len){
++    int i = 0;
++    if( data==NULL || strlen(data)!=PROG_DATA_LEN ){
++        set_ProgDate_help();
++    }
++    else{
++        if(parse_prog_date(data) == RET_SUCCESS){
++            for( i = 0 ; i < PROG_DATA_LEN ; i++ ){
++                block[i] = data[i];
++            }
++            *len = PROG_DATA_LEN;
++        }
++        else
++            set_ProgDate_help();
++    }
++}
++
++void set_HardwareVersion_help(void){
++    fprintf(stderr,"HardwareVersion not invalid\n"
++        "Please match the following format: 3FE47122AAAA\n");
++    exit(1);
++}
++
++int parse_hardware_version(char *str){
++    int ret = RET_FAILED;
++    while( *str ){
++       if((*str >= '0') && (*str <= '9'))      ret = RET_SUCCESS;
++       else if((*str >= 'a') && (*str <= 'f')) ret = RET_SUCCESS;
++       else if((*str >= 'A') && (*str <= 'F')) ret = RET_SUCCESS;
++       else{
++           return RET_FAILED;
++       }
++       str++;
++    }
++    return ret;
++}
++
++void set_HardwareVersion(char *data,char *block,int *len){
++    int i = 0;
++    if( data==NULL || strlen(data)!=HARDWARE_VERSION_LEN ){
++        set_HardwareVersion_help();
++    }
++    else{
++        if(parse_hardware_version(data) == RET_SUCCESS){
++            for( i = 0 ; i < HARDWARE_VERSION_LEN ; i++ ){
++                block[i] = data[i];
++            }
++            *len = HARDWARE_VERSION_LEN;
++        }
++        else
++            set_HardwareVersion_help();
++    }
++}
++//#endif //ODM_GEMTEK
+diff --git a/userspace/private/apps/i2c-tools/tools/util.h b/userspace/private/apps/i2c-tools/tools/util.h
+index f4f4817..bef937c 100644
+--- a/userspace/private/apps/i2c-tools/tools/util.h
++++ b/userspace/private/apps/i2c-tools/tools/util.h
+@@ -23,4 +23,25 @@
+ 
+ extern int user_ack(int def);
+ 
++//#ifdef ODM_GEMTEK
++
++#define E2PROM_PARM_LEN  32
++#define RET_FAILED       (-1)
++#define RET_SUCCESS      1
++#define HEX_MODE         0
++#define CHARACTER_MODE   1
++
++typedef struct {
++    char parm[32];
++    unsigned char initialAddr;
++    int length;
++    int printMode; // 0 is hex , 1 is character
++    void (*set)(char *,char *,int *);
++} E2PROM_DATA_MAP;
++
++extern E2PROM_DATA_MAP nokia_ri[];
++extern int find_nokia_RI_entry(char *parm);
++extern void print_all_support_parm(void);
++//#endif //ODM_GEMTEK
++
+ #endif /* _UTIL_H */
+-- 
+2.7.4
+

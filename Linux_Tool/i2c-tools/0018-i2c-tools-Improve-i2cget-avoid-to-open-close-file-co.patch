@@ -1,0 +1,63 @@
+From f9615c1e72431df9358bf9270a30dc5839ee79f6 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Fri, 22 Mar 2019 15:33:16 +0800
+Subject: [PATCH 18/38] [i2c-tools] Improve i2cget , avoid to open,close file
+ continuously
+
+[Decription]
+    1.avoid open , close i2c-dev continuously.
+
+[Peer Review]
+    Matthew
+
+[Unit Test]
+    1.build succress.
+    2.check i2cget cmd work correctly.
+
+Change-Id: I4455d076953fcc6710241ec7666a0ee2b821d954
+---
+ userspace/private/apps/i2c-tools/tools/i2cget.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cget.c b/userspace/private/apps/i2c-tools/tools/i2cget.c
+index c929852..2486ee4 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cget.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cget.c
+@@ -309,9 +309,9 @@ int main(int argc, char *argv[])
+ 
+     unsigned char gtk_block[32]= {0};
+     int stored_length = 0;
++    file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
+     do {
+ //#endif //ODM_GEMTEK
+-        file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
+         if (file < 0
+                 || check_funcs(file, size, daddress, pec)
+                 || set_slave_addr(file, address, force))
+@@ -342,10 +342,14 @@ int main(int argc, char *argv[])
+             default: /* I2C_SMBUS_BYTE_DATA */
+                 res = i2c_smbus_read_byte_data(file, daddress);
+         }
+-        close(file);
++//#ifdef ODM_GEMTEK
++//#else
++//        close(file);
++//#endif //ODM_GEMTEK
+ 
+         if (res < 0) {
+             fprintf(stderr, "Error: Read failed\n");
++            close(file);
+             exit(2);
+         }
+ 
+@@ -376,6 +380,7 @@ int main(int argc, char *argv[])
+         }
+     }
+     printf("\n");
++    close(file);
+ //#endif //ODM_GEMTEK
+ 
+     exit(0);
+-- 
+2.7.4
+

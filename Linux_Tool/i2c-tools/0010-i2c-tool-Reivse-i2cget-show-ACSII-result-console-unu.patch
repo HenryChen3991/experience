@@ -1,0 +1,44 @@
+From 7b7d8a1995c710da93040ae1f31eed06ffbc7016 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Fri, 22 Mar 2019 15:53:30 +0800
+Subject: [PATCH 10/38] [i2c-tool] Reivse i2cget show ACSII result console
+ unusual
+
+[Description]
+    1.Reivse i2cget show ACSII result console unusual,
+      only show 0x20~0x7f
+
+[Peer Review]
+    Matthew
+
+[Unit Test]
+    1.build success.
+    2.check i2cget.
+
+Change-Id: Ib8110de0da6217cca11428361ddff29d1c163ad6
+---
+ userspace/private/apps/i2c-tools/tools/i2cget.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cget.c b/userspace/private/apps/i2c-tools/tools/i2cget.c
+index b62192a..c47a43b 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cget.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cget.c
+@@ -327,8 +327,12 @@ int main(int argc, char *argv[])
+     for(i=0; i<stored_length; i++)
+         printf("0x%0*x ", size == I2C_SMBUS_WORD_DATA ? 4 : 2, gtk_block[i]);
+     printf("\nASCII:\n");
+-    for(i=0; i<stored_length; i++)
+-        printf("%c",gtk_block[i]);
++    for(i=0; i<stored_length; i++){
++        if( gtk_block[i] > 0x1F && gtk_block[i] < 0x7F )
++            printf("%c",gtk_block[i]);
++        else
++            printf(" ");
++    }
+     printf("\n");
+ //#endif //ODM_GEMTEK
+ 
+-- 
+2.7.4
+

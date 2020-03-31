@@ -1,0 +1,97 @@
+From a61259775f70ce2be6a67c634fa4b162d51b8d15 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Tue, 4 Jun 2019 17:40:23 +0800
+Subject: [PATCH 38/38] [i2c-tools] Support i2cset -G FactoryCode
+
+[Description]
+    Support i2cset -G FactoryCode
+
+[Unit test]
+    i2cset -G FactoryCode 11
+    i2gset -G FactoryCode
+
+Change-Id: Iac52ddab61018added49e6b9d1b0732bff4f53a6
+---
+ userspace/private/apps/i2c-tools/tools/util.c | 41 ++++++++++++++++++++++++++-
+ 1 file changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/util.c b/userspace/private/apps/i2c-tools/tools/util.c
+index e181223..ecbd62a 100644
+--- a/userspace/private/apps/i2c-tools/tools/util.c
++++ b/userspace/private/apps/i2c-tools/tools/util.c
+@@ -76,6 +76,9 @@ void set_HardwareVersion_help(void);
+ void set_YPSerialNum(char *,char *,int *);
+ void set_YPSerialNum_help(void);
+ int parse_yp_serialnum(char *);
++void set_FactoryCode(char *,char *,int *);
++void set_FactoryCode_help(void);
++int parse_factorycode(char *);
+ 
+ #define MAC_ADDRESS_LEN        6
+ #define MAC_STR_ADDRESS_LEN   17
+@@ -83,11 +86,12 @@ int parse_yp_serialnum(char *);
+ #define HARDWARE_VERSION_LEN  12
+ #define YPSERIALNUM_LEN       16
+ #define ICS_LEN                2
++#define FACTORY_CODE_LEN       2
+ 
+ E2PROM_DATA_MAP nokia_ri[] = {
+     {"Format"            ,0x0   ,2  ,CHARACTER_MODE   ,NULL},//0x56 i2c-device (256 bytes)
+     {"MfrID"             ,0x2   ,4  ,CHARACTER_MODE   ,NULL},
+-    {"FactoryCode"       ,0x6   ,2  ,CHARACTER_MODE   ,NULL},
++    {"FactoryCode"       ,0x6   ,2  ,CHARACTER_MODE   ,set_FactoryCode},
+     {"HardwareVersion"   ,0x8   ,12 ,CHARACTER_MODE   ,set_HardwareVersion},
+     {"ICS"               ,0x14  ,2  ,CHARACTER_MODE   ,set_ICS},
+     {"YPSerialNum"       ,0x16  ,16 ,CHARACTER_MODE   ,set_YPSerialNum},//0x20 *8 ,0x30 *8
+@@ -234,6 +238,40 @@ void set_ProgDate(char *data,char *block,int *len){
+     }
+ }
+ 
++void set_FactoryCode_help(void){
++    fprintf(stderr,"FactoryCode is not valid\n"
++        "Please match the following format: 11\n");
++    exit(1);
++}
++
++int parse_factorycode(char *str){
++    int ret = RET_FAILED;
++    while( *str ){
++        if((*str >= '0') && (*str <= '9'))    ret = RET_SUCCESS;
++        else
++            return RET_FAILED;
++        str++;
++    }
++    return ret;
++}
++
++void set_FactoryCode(char *data,char *block,int *len){
++    int i = 0;
++    if( data==NULL || strlen(data)!=FACTORY_CODE_LEN ){
++        set_FactoryCode_help();
++    }
++    else{
++        if(parse_factorycode(data) == RET_SUCCESS){
++            for( i = 0 ; i < FACTORY_CODE_LEN ; i++ ){
++                block[i] = data[i];
++            }
++            *len = FACTORY_CODE_LEN;
++        }
++        else
++            set_FactoryCode_help();
++    }
++}
++
+ void set_ICS_help(void){
+     fprintf(stderr,"ICS is not valid\n"
+         "Please match the following format: 01\n");
+@@ -267,6 +305,7 @@ void set_ICS(char *data,char *block,int *len){
+             set_ICS_help();
+     }
+ }
++
+ void set_HardwareVersion_help(void){
+     fprintf(stderr,"HardwareVersion is not valid\n"
+         "Please match the following format: 3FE47122AAAA\n");
+-- 
+2.7.4
+

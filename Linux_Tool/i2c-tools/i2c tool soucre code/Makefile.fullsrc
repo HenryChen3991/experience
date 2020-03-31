@@ -1,0 +1,69 @@
+#
+# In most cases, you only need to modify this first section.
+#
+
+EXE = i2cdump i2cdetect i2cset i2cget
+OBJS = i2cdump.o i2cdetect.o i2cset.o i2cget.o
+
+TOOLS_DIR	:= tools
+
+all dynamic install : source-i2c
+	
+export CC
+source-i2c:
+	make -f ./Makefile-i2c
+
+clean: generic_clean
+	rm -rf $(TOOLS_DIR)/*.o
+	rm -rf $(TOOLS_DIR)/*.d
+	rm -rf $(TOOLS_DIR)/i2cdetect
+	rm -rf $(TOOLS_DIR)/i2cget
+	rm -rf $(TOOLS_DIR)/i2cdump
+	rm -rf $(TOOLS_DIR)/i2cset
+	rm -rf $(TARGETS_DIR)/fs.src/usr/bin/i2cdetect
+	rm -rf $(TARGETS_DIR)/fs.src/usr/bin/i2cget
+	rm -rf $(TARGETS_DIR)/fs.src/usr/bin/i2cdump
+	rm -rf $(TARGETS_DIR)/fs.src/usr/bin/i2cset
+
+binaryonly_dist_clean: clean generic_binaryonly_dist_clean
+	rm -f Makefile.fullsrc
+
+#
+# Set our CommEngine directory (by splitting the pwd into two words
+# at /userspace and taking the first word only).
+# Then include the common defines under CommEngine.
+#
+CURR_DIR := $(shell pwd)
+BUILD_DIR:=$(subst /userspace, /userspace,$(CURR_DIR))
+BUILD_DIR:=$(word 1, $(BUILD_DIR))
+
+include $(BUILD_DIR)/make.common
+
+
+ifneq ($(strip $(BUILD_BCMIPC)),)
+LIBS += -lbcmipc
+CFLAGS += -DBUILD_BCMIPC
+endif
+
+
+# CFLAGS += -D
+CFLAGS += -Werror
+
+#
+# Implicit rule will make the .c into a .o
+# Implicit rule is $(CC) -c $(CPPFLAGS) $(CFLAGS)
+# See Section 10.2 of Gnu Make manual
+#
+
+#
+# Include the rule for making dependency files.
+# The '-' in front of the second include suppresses
+# error messages when make cannot find the .d files.
+# It will just regenerate them.
+# See Section 4.14 of Gnu Make.
+#
+
+include $(BUILD_DIR)/make.deprules
+
+-include $(OBJS:.o=.d)
+

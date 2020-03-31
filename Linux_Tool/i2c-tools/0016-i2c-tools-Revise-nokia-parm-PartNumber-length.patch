@@ -1,0 +1,37 @@
+From 0437c4a8eb65ed2c4a1f5718968530421385aedc Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Mon, 8 Apr 2019 10:56:43 +0800
+Subject: [PATCH 16/38] [i2c-tools] Revise nokia parm "PartNumber" length
+
+[Description]
+    1.Revise parm "PartNumber" length 10 to 12.
+    2.And it will show "3FE75823AAAA" not "3FE75823AA"
+
+[Peer Review]
+    Matthew
+
+[Unit Test]
+    1.build success.
+    2.using "i2cget -G PartNumber" to check value.
+
+Change-Id: I87c40365a845dc63a61ae4dea56aa3f826a4eca3
+---
+ userspace/private/apps/i2c-tools/tools/util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/util.c b/userspace/private/apps/i2c-tools/tools/util.c
+index 73fb76d..556936d 100644
+--- a/userspace/private/apps/i2c-tools/tools/util.c
++++ b/userspace/private/apps/i2c-tools/tools/util.c
+@@ -94,7 +94,7 @@ E2PROM_DATA_MAP nokia_ri[] = {
+     {"Password"          ,0x4e  ,10 ,HEX_MODE         ,NULL},
+     {"G984Serial"        ,0x58  ,4  ,HEX_MODE         ,NULL},
+     {"HWConfiguration"   ,0x5c  ,8  ,HEX_MODE         ,NULL},
+-    {"PartNumber"        ,0x64  ,10 ,CHARACTER_MODE   ,NULL},
++    {"PartNumber"        ,0x64  ,12 ,CHARACTER_MODE   ,NULL},
+     {"Variant"           ,0x6e  ,2  ,CHARACTER_MODE   ,NULL},
+     {"Spare4"            ,0x70  ,12 ,HEX_MODE         ,NULL},
+     {"Checksum"          ,0x7c  ,2  ,HEX_MODE         ,NULL},
+-- 
+2.7.4
+

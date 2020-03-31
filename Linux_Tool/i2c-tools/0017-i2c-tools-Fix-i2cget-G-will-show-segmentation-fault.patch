@@ -1,0 +1,39 @@
+From 8867c84ecac1b5ad9be13787c0c2146c72807e65 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Mon, 8 Apr 2019 11:28:35 +0800
+Subject: [PATCH 17/38] [i2c-tools] Fix "i2cget -G" will show segmentation
+ fault
+
+[Description]
+    1.if only use "i2cget -G", the program will show segmentation fault.
+
+[Peer Review]
+    Matthew
+
+[Unit Test]
+    1.build success.
+    2.check cmd "i2cget -G",the program will work normally.
+
+Change-Id: I33547426f6f88c4e902bbf0fa84a399675191a33
+---
+ userspace/private/apps/i2c-tools/tools/i2cget.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cget.c b/userspace/private/apps/i2c-tools/tools/i2cget.c
+index 1f40acd..c929852 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cget.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cget.c
+@@ -205,6 +205,10 @@ int main(int argc, char *argv[])
+                 force = 1;
+                 yes = 1;
+                 gtk_mode = 2;
++                if( argv[2+flags] == NULL ){
++                    help();
++                    exit(1);
++                }
+                 strncpy(parm,argv[2+flags],sizeof(parm));
+                 flags++;
+                 break;
+-- 
+2.7.4
+

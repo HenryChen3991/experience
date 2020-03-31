@@ -1,0 +1,131 @@
+From ca1f5ab5b5e55d54f03d19379753199318986576 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Wed, 20 Mar 2019 12:32:59 +0800
+Subject: [PATCH 07/38] [i2c-tools] Support i2cset/i2cget can set usleep time
+ manually
+
+[Description]
+    1.set usleep default time as 10 ms to avoid to
+      write/read failed.
+    2.support cmd can set usleep time.
+    3.Command:
+          i2cset -f -y [-t delay(ms)] 0 0x56 0x3e 0x99 0x99 0x88 0x88 0x77 0x77 i
+          i2cget -f -y [-t delay(ms)] 0 0x56 0x3e g 6
+
+[Peer Review]
+    Matthew
+
+[Unit Test]
+    1.build success.
+    2.using "i2cset -f -y -t 10 0 0x56 0x3e 0x99 0x88 0x77 0x66
+      0x55 0x44 i" to test whether work correctly.
+    3.check no failed msg on console.
+    4.using "i2cdump -f -y 0 0x56" to check whether set successfully.
+    5.using "i2cget -f -y -t 10 0 0x56 g 6" to test.
+    6.using "i2cget -f -y -t 0 0x56 g 6" to check whether failed,due to few argument.
+
+Change-Id: Ie251e53ffaec63f9f226333756b8172d766b9a08
+---
+ userspace/private/apps/i2c-tools/tools/i2cget.c | 14 ++++++++++++--
+ userspace/private/apps/i2c-tools/tools/i2cset.c | 18 ++++++++++++++++--
+ 2 files changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cget.c b/userspace/private/apps/i2c-tools/tools/i2cget.c
+index 8b08eea..b62192a 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cget.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cget.c
+@@ -40,7 +40,7 @@ static void help(void)
+ {
+     fprintf(stderr,
+ //ifdef ODM_GEMTEK
+-            "Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [ DATA-ADDRESS [ MODE [LENGTH] ] ]\n"
++            "Usage: i2cget [-f] [-y] [-t delay(ms)] I2CBUS CHIP-ADDRESS [ DATA-ADDRESS [ MODE [LENGTH] ] ]\n"
+ //#else
+ //            "Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]\n"
+ //#endif //ODM_GEMTEK
+@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
+     int force = 0, yes = 0, version = 0;
+ //#ifdef ODM_GEMTEK
+     int gtk_mode = 0;
++    int delay = 10000; //10ms
+ //#endif //ODM_GEMTEK
+ 
+     /* handle (optional) flags first */
+@@ -185,6 +186,15 @@ int main(int argc, char *argv[])
+             case 'y':
+                 yes = 1;
+                 break;
++//#ifdef ODM_GEMTEK
++            case 't':
++                if ( 2+flags < argc )
++                    delay = strtol(argv[2+flags],NULL,10)*1000;
++                if (delay <= 0)
++                    fprintf(stderr, "WARNING: delay <= 0 will casue reading failed problem, and suggest set 10 ms or use default value\n");
++                flags++;
++                break;
++//#endif //ODM_GEMTEK
+             default:
+                 fprintf(stderr, "Error: Unsupported option "
+                         "\"%s\"!\n", argv[1+flags]);
+@@ -304,7 +314,7 @@ int main(int argc, char *argv[])
+         stored_length += 1;
+         gtk_len -= 1;
+         daddress += 1;
+-        usleep(1000);
++        usleep(delay);
+ //#else
+ //    	printf("0x%0*x\n", size == I2C_SMBUS_WORD_DATA ? 4 : 2, res);
+ //#endif //ODM_GEMTEK
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cset.c b/userspace/private/apps/i2c-tools/tools/i2cset.c
+index cc00930..63a53dc 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cset.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cset.c
+@@ -36,7 +36,11 @@ static void help(void) __attribute__ ((noreturn));
+ static void help(void)
+ {
+     fprintf(stderr,
+-            "Usage: i2cset [-f] [-y] [-m MASK] [-r] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]\n"
++//#ifdef ODM_GEMTEK
++            "Usage: i2cset [-f] [-y] [-m MASK] [-t delay(ms)] [-r] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]\n"
++//#else
++//            "Usage: i2cset [-f] [-y] [-m MASK] [-r] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]\n"
++//#endif //ODM_GEMTEK
+             "  I2CBUS is an integer or an I2C bus name\n"
+             "  ADDRESS is an integer (0x03 - 0xff)\n"
+             "  MODE is one of:\n"
+@@ -170,6 +174,9 @@ int main(int argc, char *argv[])
+     int force = 0, yes = 0, version = 0, readback = 0;
+     unsigned char block[I2C_SMBUS_BLOCK_MAX];
+     int len;
++//#ifdef ODM_GEMTEK
++    int delay = 10000;  //10ms
++//#endif //ODM_GEMTKE
+ 
+     /* handle (optional) flags first */
+     while (1+flags < argc && argv[1+flags][0] == '-') {
+@@ -188,6 +195,13 @@ int main(int argc, char *argv[])
+                     maskp = argv[2+flags];
+                 flags++;
+                 break;
++            case 't':
++                if (2+flags < argc)
++                   delay = strtol(argv[2+flags],NULL,10)*1000;
++                if (delay <= 0)
++                   fprintf(stderr, "WARNING: delay <= 0 will casue writing failed problem, and suggest set 10 ms or use default value\n");
++                flags++;
++                break;
+             case 'r':
+                 readback = 1;
+                 break;
+@@ -485,7 +499,7 @@ int main(int argc, char *argv[])
+             //update next time written address
+             gtk_addr = gtk_addr + gap;
+             total -= gtk_len;
+-            usleep(1000);
++            usleep(delay);
+ //#else
+ //      exit(0);
+ //#endif //ODM_GEMTEK
+-- 
+2.7.4
+

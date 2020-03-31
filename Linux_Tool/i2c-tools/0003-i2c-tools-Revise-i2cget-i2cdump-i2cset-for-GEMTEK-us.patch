@@ -1,0 +1,570 @@
+From 793fc347e50dbfb2e2e04d2907c16b7ed54605d8 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Tue, 19 Mar 2019 16:39:17 +0800
+Subject: [PATCH 03/38] [i2c-tools] Revise i2cget i2cdump i2cset for GEMTEK
+ using format
+
+[Description]
+    1.remove to prompt, never enter yes again.
+    2.support i2cset and i2cget can set/get more data once.
+    3.Using Method:
+         i2cdump -f -y 0 0x56
+         i2cset -f -y 0 0x56 0x3e 0x99 0x99 0x99 0x99 0x99 0x99 i => set mac address.
+         i2cget -f -y 0 0x56 0x3e g 6 => get mac address.
+
+[Peer Review]
+    Matthew
+
+[Unit Test]
+    1.build success.
+    2.check i2cdump i2cset i2cget whether work correctly.
+
+Change-Id: I879184382a152564147ff045c19e7c7f494b1b70
+---
+ userspace/private/apps/i2c-tools/tools/i2cdump.c |  15 +-
+ userspace/private/apps/i2c-tools/tools/i2cget.c  | 136 +++++++----
+ userspace/private/apps/i2c-tools/tools/i2cset.c  | 288 ++++++++++++++---------
+ 3 files changed, 288 insertions(+), 151 deletions(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cdump.c b/userspace/private/apps/i2c-tools/tools/i2cdump.c
+index 81e3d4b..cc73aa1 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cdump.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cdump.c
+@@ -317,12 +317,17 @@ int main(int argc, char *argv[])
+                     first, last);
+         }
+ 
+-        fprintf(stderr, "Continue? [Y/n] ");
++//#ifdef ODM_GEMTEK
++//        fprintf(stderr, "Continue? [Y/n] ");
++//#endif //ODM_GEMTEK
+         fflush(stderr);
+-        if (!user_ack(1)) {
+-            fprintf(stderr, "Aborting on user request.\n");
+-            exit(0);
+-        }
++//#ifdef ODM_GEMTEK
++//#else
++//        if (!user_ack(1)) {
++//            fprintf(stderr, "Aborting on user request.\n");
++//            exit(0);
++//        }
++//#endif //ODM_GEMTEK
+     }
+ 
+     /* See Winbond w83781d data sheet for bank details */
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cget.c b/userspace/private/apps/i2c-tools/tools/i2cget.c
+index db16acb..8b08eea 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cget.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cget.c
+@@ -39,13 +39,20 @@ static void help(void) __attribute__ ((noreturn));
+ static void help(void)
+ {
+     fprintf(stderr,
+-            "Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]\n"
++//ifdef ODM_GEMTEK
++            "Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [ DATA-ADDRESS [ MODE [LENGTH] ] ]\n"
++//#else
++//            "Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]\n"
++//#endif //ODM_GEMTEK
+             "  I2CBUS is an integer or an I2C bus name\n"
+             "  ADDRESS is an integer (0x03 - 0xff)\n"
+             "  MODE is one of:\n"
+             "    b (read byte data, default)\n"
+             "    w (read word data)\n"
+             "    c (write byte/read byte)\n"
++//#ifdef ODM_GEMTEK
++            "    g [LENGTH] (GEMTEK mode,length default is 1)\n"
++//#endif //ODM_GEMTEK
+             "    Append p for SMBus PEC\n");
+     exit(1);
+ }
+@@ -138,12 +145,17 @@ static int confirm(const char *filename, int address, int size, int daddress,
+     if (pec)
+         fprintf(stderr, "PEC checking enabled.\n");
+ 
+-    fprintf(stderr, "Continue? [%s] ", dont ? "y/N" : "Y/n");
++//#ifdef ODM_GEMTEK
++//    fprintf(stderr, "Continue? [%s] ", dont ? "y/N" : "Y/n");
++//#endif //ODM_GEMTEK
+     fflush(stderr);
+-    if (!user_ack(!dont)) {
+-        fprintf(stderr, "Aborting on user request.\n");
+-        return 0;
+-    }
++//#ifdef ODM_GEMTEK
++//#else
++//        if (!user_ack(1)) {
++//            fprintf(stderr, "Aborting on user request.\n");
++//            exit(0);
++//        }
++//#endif //ODM_GEMTEK
+ 
+     return 1;
+ }
+@@ -157,6 +169,9 @@ int main(int argc, char *argv[])
+     int pec = 0;
+     int flags = 0;
+     int force = 0, yes = 0, version = 0;
++//#ifdef ODM_GEMTEK
++    int gtk_mode = 0;
++//#endif //ODM_GEMTEK
+ 
+     /* handle (optional) flags first */
+     while (1+flags < argc && argv[1+flags][0] == '-') {
+@@ -219,6 +234,11 @@ int main(int argc, char *argv[])
+             case 'c':
+                 size = I2C_SMBUS_BYTE;
+                 break;
++//#ifdef ODM_GEMTEK
++            case 'g':
++                gtk_mode = 1;
++                break;
++//#endif //ODM_GEMTEK
+             default:
+                 fprintf(stderr, "Error: Invalid mode!\n");
+                 help();
+@@ -226,45 +246,81 @@ int main(int argc, char *argv[])
+         pec = argv[flags+4][1] == 'p';
+     }
+ 
+-    file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
+-    if (file < 0
+-            || check_funcs(file, size, daddress, pec)
+-            || set_slave_addr(file, address, force))
+-        exit(1);
+-
+-    if (!yes && !confirm(filename, address, size, daddress, pec))
+-        exit(0);
++//#ifdef ODM_GEMTEK
++    int gtk_len = 1;
++    if(gtk_mode == 1) {
++        if (argc > flags + 5) {
++            gtk_len = strtol(argv[flags+5], &end, 0);
++            if( *end || gtk_len <= 0 || gtk_len > 32 ) {
++                fprintf(stderr,"Error: Length invalid! must be 1~32\n");
++                help();
++            }
++        }
++    }
++    unsigned char gtk_block[32]= {0};
++    int stored_length = 0;
++    do {
++//#endif //ODM_GEMTEK
++        file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
++        if (file < 0
++                || check_funcs(file, size, daddress, pec)
++                || set_slave_addr(file, address, force))
++            exit(1);
++
++        if (!yes && !confirm(filename, address, size, daddress, pec))
++            exit(0);
++
++        if (pec && ioctl(file, I2C_PEC, 1) < 0) {
++            fprintf(stderr, "Error: Could not set PEC: %s\n",
++                    strerror(errno));
++            close(file);
++            exit(1);
++        }
+ 
+-    if (pec && ioctl(file, I2C_PEC, 1) < 0) {
+-        fprintf(stderr, "Error: Could not set PEC: %s\n",
+-                strerror(errno));
++        switch (size) {
++            case I2C_SMBUS_BYTE:
++                if (daddress >= 0) {
++                    res = i2c_smbus_write_byte(file, daddress);
++                    if (res < 0)
++                        fprintf(stderr, "Warning - write failed\n");
++                }
++                res = i2c_smbus_read_byte(file);
++                break;
++            case I2C_SMBUS_WORD_DATA:
++                res = i2c_smbus_read_word_data(file, daddress);
++                break;
++            default: /* I2C_SMBUS_BYTE_DATA */
++                res = i2c_smbus_read_byte_data(file, daddress);
++        }
+         close(file);
+-        exit(1);
+-    }
+ 
+-    switch (size) {
+-        case I2C_SMBUS_BYTE:
+-            if (daddress >= 0) {
+-                res = i2c_smbus_write_byte(file, daddress);
+-                if (res < 0)
+-                    fprintf(stderr, "Warning - write failed\n");
+-            }
+-            res = i2c_smbus_read_byte(file);
+-            break;
+-        case I2C_SMBUS_WORD_DATA:
+-            res = i2c_smbus_read_word_data(file, daddress);
+-            break;
+-        default: /* I2C_SMBUS_BYTE_DATA */
+-            res = i2c_smbus_read_byte_data(file, daddress);
+-    }
+-    close(file);
++        if (res < 0) {
++            fprintf(stderr, "Error: Read failed\n");
++            exit(2);
++        }
+ 
+-    if (res < 0) {
+-        fprintf(stderr, "Error: Read failed\n");
+-        exit(2);
++//#ifdef ODM_GMETEK
++        gtk_block[stored_length] = res;
++        stored_length += 1;
++        gtk_len -= 1;
++        daddress += 1;
++        usleep(1000);
++//#else
++//    	printf("0x%0*x\n", size == I2C_SMBUS_WORD_DATA ? 4 : 2, res);
++//#endif //ODM_GEMTEK
++
++//#ifdef ODM_GEMTEK
+     }
+-
+-    printf("0x%0*x\n", size == I2C_SMBUS_WORD_DATA ? 4 : 2, res);
++    while(gtk_len!=0);
++    int i=0;
++    printf("HEX:\n");
++    for(i=0; i<stored_length; i++)
++        printf("0x%0*x ", size == I2C_SMBUS_WORD_DATA ? 4 : 2, gtk_block[i]);
++    printf("\nASCII:\n");
++    for(i=0; i<stored_length; i++)
++        printf("%c",gtk_block[i]);
++    printf("\n");
++//#endif //ODM_GEMTEK
+ 
+     exit(0);
+ }
+diff --git a/userspace/private/apps/i2c-tools/tools/i2cset.c b/userspace/private/apps/i2c-tools/tools/i2cset.c
+index 3c85248..cc00930 100644
+--- a/userspace/private/apps/i2c-tools/tools/i2cset.c
++++ b/userspace/private/apps/i2c-tools/tools/i2cset.c
+@@ -143,12 +143,17 @@ static int confirm(const char *filename, int address, int size, int daddress,
+     if (pec)
+         fprintf(stderr, "PEC checking enabled.\n");
+ 
+-    fprintf(stderr, "Continue? [%s] ", dont ? "y/N" : "Y/n");
++//#ifdef ODM_GEMTEK
++//    fprintf(stderr, "Continue? [%s] ", dont ? "y/N" : "Y/n");
++//#endif //ODM_GEMTEK
+     fflush(stderr);
+-    if (!user_ack(!dont)) {
+-        fprintf(stderr, "Aborting on user request.\n");
+-        return 0;
+-    }
++//#ifdef ODM_GEMTEK
++//#else
++//        if (!user_ack(1)) {
++//            fprintf(stderr, "Aborting on user request.\n");
++//            exit(0);
++//        }
++//#endif //ODM_GEMTEK
+ 
+     return 1;
+ }
+@@ -329,125 +334,196 @@ int main(int argc, char *argv[])
+         }
+     }
+ 
+-    file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
+-    if (file < 0
+-            || check_funcs(file, size, pec)
+-            || set_slave_addr(file, address, force))
+-        exit(1);
++//#ifdef ODM_GEMTEK
++    unsigned char gtk_block[32] = {0};
++    int gtk_addr = daddress;
++    int total = len;
++
++    do {
++        int gtk_len = 0;
++        int i = 0;
++        int gap = (gtk_addr | 0x0F) - gtk_addr + 1;
++        if(total > gap) {
++            gtk_len = gap;
++        }
++        else {
++            gtk_len = total;
++        }
++        memset(gtk_block,0,sizeof(gtk_block));
++        memmove(gtk_block,block+(len-total),gtk_len);
++//#endif //ODM_GEMTEK
+ 
+-    if (!yes && !confirm(filename, address, size, daddress,
+-                         value, vmask, block, len, pec))
+-        exit(0);
++        file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
++
++        if (file < 0
++                || check_funcs(file, size, pec)
++                || set_slave_addr(file, address, force))
++            exit(1);
++
++//#ifdef ODM_GEMTEK
++        if (!yes && !confirm(filename, address, size, gtk_addr,
++                             value, vmask, gtk_block, gtk_len, pec))
++            exit(0);
++//#else
++//    if (!yes && !confirm(filename, address, size, daddress,
++//                         value, vmask, block, len, pec))
++//        exit(0);
++//#endif //ODM_GEMTEK
++
++        if (vmask) {
++            int oldvalue;
++            switch (size) {
++                case I2C_SMBUS_BYTE:
++                    oldvalue = i2c_smbus_read_byte(file);
++                    break;
++                case I2C_SMBUS_WORD_DATA:
++//#ifdef ODM_GEMTEK
++                    oldvalue = i2c_smbus_read_word_data(file, gtk_addr);
++//#else
++//                oldvalue = i2c_smbus_read_word_data(file, daddress);
++//#endif //ODM_GEMTEK
++                    break;
++                default:
++//#ifdef ODM_GEMTEK
++                    oldvalue = i2c_smbus_read_byte_data(file, gtk_addr);
++//#else
++//                oldvalue = i2c_smbus_read_byte_data(file, daddress);
++//#endif //ODM_GEMTEK
++            }
+ 
+-    if (vmask) {
+-        int oldvalue;
++            if (oldvalue < 0) {
++                fprintf(stderr, "Error: Failed to read old value\n");
++                exit(1);
++            }
+ 
++            value = (value & vmask) | (oldvalue & ~vmask);
++
++            if (!yes) {
++                fprintf(stderr, "Old value 0x%0*x, write mask "
++                        "0x%0*x: Will write 0x%0*x to register "
++                        "0x%02x\n",
++                        size == I2C_SMBUS_WORD_DATA ? 4 : 2, oldvalue,
++                        size == I2C_SMBUS_WORD_DATA ? 4 : 2, vmask,
++                        size == I2C_SMBUS_WORD_DATA ? 4 : 2, value,
++                        daddress);
++
++                fprintf(stderr, "Continue? [Y/n] ");
++                fflush(stderr);
++                if (!user_ack(1)) {
++                    fprintf(stderr, "Aborting on user request.\n");
++                    exit(0);
++                }
++            }
++        }
++
++        if (pec && ioctl(file, I2C_PEC, 1) < 0) {
++            fprintf(stderr, "Error: Could not set PEC: %s\n",
++                    strerror(errno));
++            close(file);
++            exit(1);
++        }
++
++//#ifdef ODM_GEMTEK
+         switch (size) {
+             case I2C_SMBUS_BYTE:
+-                oldvalue = i2c_smbus_read_byte(file);
++
++                res = i2c_smbus_write_byte(file, gtk_addr);
+                 break;
+             case I2C_SMBUS_WORD_DATA:
+-                oldvalue = i2c_smbus_read_word_data(file, daddress);
++                res = i2c_smbus_write_word_data(file, gtk_addr, value);
++                break;
++            case I2C_SMBUS_BLOCK_DATA:
++                res = i2c_smbus_write_block_data(file, gtk_addr, gtk_len, gtk_block);
++                break;
++            case I2C_SMBUS_I2C_BLOCK_DATA:
++                res = i2c_smbus_write_i2c_block_data(file,  gtk_addr, gtk_len, gtk_block);
++                break;
++            default: /* I2C_SMBUS_BYTE_DATA */
++                res = i2c_smbus_write_byte_data(file, gtk_addr, value);
+                 break;
+-            default:
+-                oldvalue = i2c_smbus_read_byte_data(file, daddress);
+         }
++//#else
++        /*
++                switch (size) {
++                    case I2C_SMBUS_BYTE:
++                        res = i2c_smbus_write_byte(file, daddress);
++                        break;
++                    case I2C_SMBUS_WORD_DATA:
++                        res = i2c_smbus_write_word_data(file, daddress, value);
++                        break;
++                    case I2C_SMBUS_BLOCK_DATA:
++                        res = i2c_smbus_write_block_data(file, daddress, len, block);
++                        break;
++                    case I2C_SMBUS_I2C_BLOCK_DATA:
++                        res = i2c_smbus_write_i2c_block_data(file, daddress, len, block);
++                        break;
++                    default: // I2C_SMBUS_BYTE_DATA
++                        res = i2c_smbus_write_byte_data(file, daddress, value);
++                        break;
++                }
++        */
++//#endif //ODM_GEMTEK
+ 
+-        if (oldvalue < 0) {
+-            fprintf(stderr, "Error: Failed to read old value\n");
++        if (res < 0) {
++            fprintf(stderr, "Error: Write failed\n");
++            close(file);
+             exit(1);
+         }
+ 
+-        value = (value & vmask) | (oldvalue & ~vmask);
+-
+-        if (!yes) {
+-            fprintf(stderr, "Old value 0x%0*x, write mask "
+-                    "0x%0*x: Will write 0x%0*x to register "
+-                    "0x%02x\n",
+-                    size == I2C_SMBUS_WORD_DATA ? 4 : 2, oldvalue,
+-                    size == I2C_SMBUS_WORD_DATA ? 4 : 2, vmask,
+-                    size == I2C_SMBUS_WORD_DATA ? 4 : 2, value,
+-                    daddress);
+-
+-            fprintf(stderr, "Continue? [Y/n] ");
+-            fflush(stderr);
+-            if (!user_ack(1)) {
+-                fprintf(stderr, "Aborting on user request.\n");
+-                exit(0);
++        if (pec) {
++            if (ioctl(file, I2C_PEC, 0) < 0) {
++                fprintf(stderr, "Error: Could not clear PEC: %s\n",
++                        strerror(errno));
++                close(file);
++                exit(1);
+             }
+         }
+-    }
+-
+-    if (pec && ioctl(file, I2C_PEC, 1) < 0) {
+-        fprintf(stderr, "Error: Could not set PEC: %s\n",
+-                strerror(errno));
+-        close(file);
+-        exit(1);
+-    }
+ 
+-    switch (size) {
+-        case I2C_SMBUS_BYTE:
+-            res = i2c_smbus_write_byte(file, daddress);
+-            break;
+-        case I2C_SMBUS_WORD_DATA:
+-            res = i2c_smbus_write_word_data(file, daddress, value);
+-            break;
+-        case I2C_SMBUS_BLOCK_DATA:
+-            res = i2c_smbus_write_block_data(file, daddress, len, block);
+-            break;
+-        case I2C_SMBUS_I2C_BLOCK_DATA:
+-            res = i2c_smbus_write_i2c_block_data(file, daddress, len, block);
+-            break;
+-        default: /* I2C_SMBUS_BYTE_DATA */
+-            res = i2c_smbus_write_byte_data(file, daddress, value);
+-            break;
+-    }
+-    if (res < 0) {
+-        fprintf(stderr, "Error: Write failed\n");
+-        close(file);
+-        exit(1);
+-    }
+-
+-    if (pec) {
+-        if (ioctl(file, I2C_PEC, 0) < 0) {
+-            fprintf(stderr, "Error: Could not clear PEC: %s\n",
+-                    strerror(errno));
++        if (!readback) { /* We're done */
+             close(file);
+-            exit(1);
++//#ifdef ODM_GEMTEK
++            //update next time written address
++            gtk_addr = gtk_addr + gap;
++            total -= gtk_len;
++            usleep(1000);
++//#else
++//      exit(0);
++//#endif //ODM_GEMTEK
+         }
+-    }
+-
+-    if (!readback) { /* We're done */
+-        close(file);
+-        exit(0);
+-    }
+-
+-    switch (size) {
+-        case I2C_SMBUS_BYTE:
+-            res = i2c_smbus_read_byte(file);
+-            value = daddress;
+-            break;
+-        case I2C_SMBUS_WORD_DATA:
+-            res = i2c_smbus_read_word_data(file, daddress);
+-            break;
+-        default: /* I2C_SMBUS_BYTE_DATA */
+-            res = i2c_smbus_read_byte_data(file, daddress);
+-    }
+-    close(file);
+-
+-    if (res < 0) {
+-        printf("Warning - readback failed\n");
+-    }
+-    else if (res != value) {
+-        printf("Warning - data mismatch - wrote "
+-               "0x%0*x, read back 0x%0*x\n",
+-               size == I2C_SMBUS_WORD_DATA ? 4 : 2, value,
+-               size == I2C_SMBUS_WORD_DATA ? 4 : 2, res);
+-    }
+-    else {
+-        printf("Value 0x%0*x written, readback matched\n",
+-               size == I2C_SMBUS_WORD_DATA ? 4 : 2, value);
+-    }
++//#ifdef ODM_GEMTEK
++        else {
++//#endif //ODM_GEMTEK
++            switch (size) {
++                case I2C_SMBUS_BYTE:
++                    res = i2c_smbus_read_byte(file);
++                    value = daddress;
++                    break;
++                case I2C_SMBUS_WORD_DATA:
++                    res = i2c_smbus_read_word_data(file, daddress);
++                    break;
++                default: /* I2C_SMBUS_BYTE_DATA */
++                    res = i2c_smbus_read_byte_data(file, /*daddress*/ gtk_addr);
++            }
++            close(file);
+ 
++            if (res < 0) {
++                printf("Warning - readback failed\n");
++            }
++            else if (res != value) {
++                printf("Warning - data mismatch - wrote "
++                       "0x%0*x, read back 0x%0*x\n",
++                       size == I2C_SMBUS_WORD_DATA ? 4 : 2, value,
++                       size == I2C_SMBUS_WORD_DATA ? 4 : 2, res);
++            }
++            else {
++                printf("Value 0x%0*x written, readback matched\n",
++                       size == I2C_SMBUS_WORD_DATA ? 4 : 2, value);
++            }
++//#ifdef ODM_GEMTEK
++        }
++//#endif //ODM_GEMTEK
++//#ifdef ODM_GEMTEK
++    } while(total!=0);  //end for do while
++//#endif //ODM_GEMTEK
+     exit(0);
+ }
+-- 
+2.7.4
+

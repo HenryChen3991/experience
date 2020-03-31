@@ -1,0 +1,62 @@
+From 5a246184f23e958ef7537ef6ae864dce37e769b0 Mon Sep 17 00:00:00 2001
+From: matthew_chou <matthew_chou@gemteks.com>
+Date: Tue, 4 Jun 2019 17:21:28 +0800
+Subject: [PATCH 37/38] [i2c-tools] Fix typo UserNmae and PROG_DATA
+
+[Description]
+    Fix typo UserNmae and PROG_DATA as UserName and PROG_DATE
+
+[Unit test]
+    i2cget -G UserName
+    i2cget -G ProgDate
+    i2cset -G ProgDate 190604
+
+Change-Id: I5cd7c6b3e705119487aad2e62aeced6cf16ebf60
+---
+ userspace/private/apps/i2c-tools/tools/util.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/userspace/private/apps/i2c-tools/tools/util.c b/userspace/private/apps/i2c-tools/tools/util.c
+index 1b32b88..e181223 100644
+--- a/userspace/private/apps/i2c-tools/tools/util.c
++++ b/userspace/private/apps/i2c-tools/tools/util.c
+@@ -79,7 +79,7 @@ int parse_yp_serialnum(char *);
+ 
+ #define MAC_ADDRESS_LEN        6
+ #define MAC_STR_ADDRESS_LEN   17
+-#define PROG_DATA_LEN          6
++#define PROG_DATE_LEN          6
+ #define HARDWARE_VERSION_LEN  12
+ #define YPSERIALNUM_LEN       16
+ #define ICS_LEN                2
+@@ -107,7 +107,7 @@ E2PROM_DATA_MAP nokia_ri[] = {
+     {"Spare4"            ,0x70  ,12 ,HEX_MODE         ,NULL},
+     {"Checksum"          ,0x7c  ,2  ,HEX_MODE         ,NULL},
+     {"InserviceReg"      ,0x7e  ,2  ,HEX_MODE         ,NULL},
+-    {"UserNmae"          ,0x80  ,16 ,CHARACTER_MODE   ,NULL},//*
++    {"UserName"          ,0x80  ,16 ,CHARACTER_MODE   ,NULL},//*
+     {"UserPassword"      ,0x90  ,8  ,CHARACTER_MODE   ,NULL},//*
+     {"MgntUserName"      ,0x98  ,16 ,CHARACTER_MODE   ,NULL},//*
+     {"MgntUserPasswrod"  ,0xA8  ,8  ,CHARACTER_MODE   ,NULL},//*
+@@ -219,15 +219,15 @@ int parse_prog_date(char *str){
+ 
+ void set_ProgDate(char *data,char *block,int *len){
+     int i = 0;
+-    if( data==NULL || strlen(data)!=PROG_DATA_LEN ){
++    if( data==NULL || strlen(data)!=PROG_DATE_LEN ){
+         set_ProgDate_help();
+     }
+     else{
+         if(parse_prog_date(data) == RET_SUCCESS){
+-            for( i = 0 ; i < PROG_DATA_LEN ; i++ ){
++            for( i = 0 ; i < PROG_DATE_LEN ; i++ ){
+                 block[i] = data[i];
+             }
+-            *len = PROG_DATA_LEN;
++            *len = PROG_DATE_LEN;
+         }
+         else
+             set_ProgDate_help();
+-- 
+2.7.4
+
