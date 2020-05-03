@@ -33,7 +33,8 @@ int main(int argc,char *argv[])
 
         DEBUG("id = %4d , age = %2d , name = %s , phone = %s",employee->id,employee->age,employee->name,employee->phone);
 
-        hashtable->hashtable_insert(hashtable,(void *)employee->name,(void *)employee);
+        //hashtable->hashtable_insert(hashtable,(void *)employee->name,(void *)employee);
+        hashtable->hashtable_insert(hashtable,(void *)&employee->id,(void *)employee);
     }
 
     hashtable->hashtable_destory(hashtable);

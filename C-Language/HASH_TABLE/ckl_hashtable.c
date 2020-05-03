@@ -33,7 +33,8 @@ hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_con
 
     ht = (hashtable_t *)malloc(sizeof(hashtable_t));
     if(ht == NULL){
-        ERROR("hash table malloc failed");
+        ERROR(
+"hash table malloc failed");
         exit(0);
     }
 
@@ -88,8 +89,9 @@ unsigned int hash_table_destory(struct hashtable *ht)
 
 unsigned int hash_node_free(struct hashtable_node *htNode)
 {
-    //need to cast it to a non-const pointer. because "free" takes a "void *", not a "const void*"
-    free((void*)htNode->key);
+    //1.need to cast it to a non-const pointer. because "free" takes a "void *", not a "const void*"
+    //2.Due to htNode->key is pointer to htNode->data so cannot free two twice. ohterwise will segmentation fault
+    //free((void*)htNode->key);
 
     free(htNode->data);
     free(htNode);
