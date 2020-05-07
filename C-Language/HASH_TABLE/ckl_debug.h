@@ -25,13 +25,15 @@
 #define DEBUG(msg,arg...) printf("%20s:%4d " msg"\n",__FILE__,__LINE__,##arg)
 #define PRINT_FUNC(msg,arg...) printf("%20s:%4d Enter %s" msg"\n",__FILE__,__LINE__,__FUNCTION__,##arg)
 #define DEBUG_COLOR(color,msg,arg...) printf("%s%20s:%4d " msg"%s\n",color,__FILE__,__LINE__,##arg,NONECOLOR)
+#define SET_COLOR(color) printf("%s",color);
 #else
 #define DEBUG(msg,arg...)
 #define PRINT_FUNC(msg,arg...)
 #define DEBUG_COLOR(color,msg,arg...)
+#define SET_COLOT(color)
 #endif//DEBUG_FLAG
 
-#define ERROR(msg,arg...) printf("\n\033[1;31m %20s:%4d " msg"\033[0m\n",__FILE__,__LINE__,##arg)
+#define ERROR(msg,arg...) printf("\033[1;31m%20s:%4d " msg"\033[0m\n",__FILE__,__LINE__,##arg)
 
 //define enum ret
 typedef enum

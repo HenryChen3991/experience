@@ -1,14 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
 #include "ckl_debug.h"
 #include "ckl_hashtable.h"
+#include "ckl_ht.h"
 
 /*
  * HASH TABLE BEAHVIOR
  */
 int hash_table_insert(struct hashtable *ht,void *key,void *data);
 unsigned int hash_table_destory(struct hashtable *ht);
+int hashtable_dump(struct hashtable *ht);
 unsigned int hash_node_free(struct hashtable_node *htNode);
 int keycmp(const void *key1,const void *key2);
 
@@ -33,8 +37,7 @@ hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_con
 
     ht = (hashtable_t *)malloc(sizeof(hashtable_t));
     if(ht == NULL){
-        ERROR(
-"hash table malloc failed");
+        ERROR("hash table malloc failed");
         exit(0);
     }
 
@@ -53,14 +56,41 @@ hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_con
     ht->hash_node_free = hash_node_free;
     ht->keycmp = keycmp;
     ht->hashtable_insert = hash_table_insert;
+    ht->hashtable_dump = hashtable_dump;
 
     //initial ht->htables
     for(i = 0; i < slot_size ; i++)
         ht->htables[i] = NULL;
-    
+
     return ht;
 }
+int hashtable_dump(struct hashtable *ht)
+{
+    int i = 0;
+    hashtable_node_t *cur = NULL;
+    hashtable_node_t *tmp = NULL;
+    SET_COLOR(LIGHT_GREEN);
+    PRINT_FUNC();
+    for(i = 0; i < ht->slot_size ; i++){
+        if(ht->htables[i] != NULL){
+            cur = ht->htables[i];
+            printf("%20s:%4d ht[%03d]->",__FILE__,__LINE__,i);
+            while(cur!=NULL){
+                printf("%s->",(char *)cur->key);
+                cur = cur->next;
+            }
+            printf("NULL\n");
+        }
+    }
+    SET_COLOR(NONECOLOR);
 
+#if 0
+    //check cur-> data whether can cast to employee_t type
+    cur = ht->htables[0];
+    employee_t *employee = (employee_t*)cur->data;
+    DEBUG("id = %d , age = %d , name = %s , phone = %s",employee->id,employee->age,employee->name,employee->phone);
+#endif
+}
 unsigned int hash_table_destory(struct hashtable *ht)
 {
     int i = 0;
@@ -68,7 +98,7 @@ unsigned int hash_table_destory(struct hashtable *ht)
     hashtable_node_t *tmp = NULL;
 
     PRINT_FUNC();
-    
+
     for(i = 0 ; i < ht->slot_size ; i++){
         if(ht->htables[i] != NULL){
             cur = ht->htables[i];
@@ -105,8 +135,9 @@ int keycmp(const void *key1,const void *key2)
     const char *key1_ptr = NULL;
     const char *key2_ptr = NULL;
     key1_ptr = key1;
-    key1_ptr = key2;
+    key2_ptr = key2;
 
+   // DEBUG("%d %d %d %d",*(int*)key1,*(int*)key2,strlen(key1_ptr),strlen(key2_ptr));
     if(key1_ptr == NULL)
         key1_ptr = &emptyStr;
     if(key2_ptr == NULL)
@@ -118,12 +149,10 @@ int keycmp(const void *key1,const void *key2)
 int hash_table_insert(struct hashtable *ht,void *key,void *data)
 {
     hashtable_node_t *cur = NULL;
-    hashtable_node_t *prev = NULL;
     hashtable_node_t *new = NULL;
+    hashtable_node_t *tmp = NULL;
     int i = 0;
     int idx = -1;
-
-    PRINT_FUNC();
 
     if( ht == NULL || key == NULL || data == NULL){
         ERROR("invalid arguments");
@@ -131,16 +160,19 @@ int hash_table_insert(struct hashtable *ht,void *key,void *data)
     }
 
     idx = ht->hash_fun(ht,key);
-    DEBUG_COLOR(BLUE,"idx = %d",idx);
+//    DEBUG_COLOR(BLUE,"idx = %d",idx);
 
     cur = ht->htables[idx];
-    prev = cur;
 
+#if 0
+    hashtable_node_t *prev = NULL;
     //find insert position (small to big order)
     while( (cur!=NULL) && ( ht->keycmp(key,cur->key) > 0) ){
+        DEBUG("small");
         prev = cur;
         cur = cur->next;
     }
+#endif
 
     if( (cur!=NULL) && ( ht->keycmp(key,cur->key) == 0) ){
         ERROR("The data had existed");
@@ -155,14 +187,15 @@ int hash_table_insert(struct hashtable *ht,void *key,void *data)
     //assign hash node
     new->key = key;
     new->data = data;
+    new->next = NULL;
 
-    if(prev == NULL){
-        ht->htables[idx] = new;
-        new->next = NULL;
+    if(cur!=NULL){
+        tmp = cur->next;
+        cur->next = new;
+        new->next = tmp;
     }
     else{
-        prev->next = new;
-        new->next = cur;
+        ht->htables[idx] = new;
     }
 
     ht->bucket_size++;
@@ -191,7 +224,7 @@ unsigned int siample_hash(const char *str)
 {
 	register unsigned int hash = 0;
 	register unsigned int seed = 131;
-    PRINT_FUNC();
+
 	while(*str)
 	{
 		hash = hash*seed + *str++;

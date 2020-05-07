@@ -1,7 +1,6 @@
 #ifndef CKL_HASHTABLE_H
 #define CKL_HASHTABLE_H
 
-
 /**
 
 ref:
@@ -22,7 +21,7 @@ slot_size           |
                 bucket_size = 6 (A~F)
 **/
 
-#define HASH_TABLE_SLOT_SIZE 1024
+#define HASH_TABLE_SLOT_SIZE (64)
 
 typedef enum
 {
@@ -49,6 +48,7 @@ typedef struct hashtable
     unsigned int (*hashtable_destory)(struct hashtable *ht);                //free hashtable
     unsigned int (*hash_node_free)(struct hashtable_node *htNode);          //free hashtable_node
     int (*hashtable_insert)(struct hashtable *ht,void *key,void *data);     //insert data into hashtable
+    int (*hashtable_dump)(struct hashtable *ht);                            //dump hashtable
 } hashtable_t;
 
 hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_control);
