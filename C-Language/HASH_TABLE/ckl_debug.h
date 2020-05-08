@@ -44,6 +44,7 @@ typedef enum
 	REQUEST_DENIED       = 9001,  //< Request denied (no reason specified)
 	INTERNAL_ERROR       = 9002,  //< Internal error
 	INVALID_ARGUMENTS    = 9003,  //< Invalid arguments
+	NOT_FOUND            = 9004,  //< Not Found
 } Ret;
 
 #endif //CKL_DEBUH_H

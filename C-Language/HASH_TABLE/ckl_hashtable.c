@@ -10,11 +10,21 @@
 /*
  * HASH TABLE BEAHVIOR
  */
+hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_control);
 int hash_table_insert(struct hashtable *ht,void *key,void *data);
-unsigned int hash_table_destory(struct hashtable *ht);
 int hashtable_dump(struct hashtable *ht);
+int hashtable_search(struct hashtable *ht,void *key,void **ptr);
+int hashtable_delete(struct hashtable *ht,void *key);
+int hashtable_revise(struct hashtable *ht,void *key,void *data);
+unsigned int hash_table_destory(struct hashtable *ht);
 unsigned int hash_node_free(struct hashtable_node *htNode);
 int keycmp(const void *key1,const void *key2);
+
+#define CHECK_ARGUMENT(arg) \
+    if(arg == NULL){ \
+    ERROR("Invalid arguments"); \
+    return INVALID_ARGUMENTS; \
+}
 
 /*
  * HASH FUNCTION HANDLER AND COLLECT HASH FUNCTION
@@ -57,6 +67,8 @@ hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_con
     ht->keycmp = keycmp;
     ht->hashtable_insert = hash_table_insert;
     ht->hashtable_dump = hashtable_dump;
+    ht->hashtable_search = hashtable_search;
+    ht->hashtable_delete = hashtable_delete;
 
     //initial ht->htables
     for(i = 0; i < slot_size ; i++)
@@ -91,6 +103,68 @@ int hashtable_dump(struct hashtable *ht)
     DEBUG("id = %d , age = %d , name = %s , phone = %s",employee->id,employee->age,employee->name,employee->phone);
 #endif
 }
+
+int hashtable_search(struct hashtable *ht,void *key,void **ptr)
+{
+    int idx = -1;
+    hashtable_node_t *cur = NULL;
+    if(key == NULL){
+        ERROR("Invalid arguments");
+        return INVALID_ARGUMENTS;
+    }
+    idx = ht->hash_fun(ht,key);
+    cur = ht->htables[idx];
+    if(cur != NULL){
+        while(cur != NULL){
+            if(ht->keycmp(cur->key,key)==0){
+                //may revise method, pass a pointer pointer to store the cur->data;
+                //so that we can support diffenert data type in the furture.
+                *ptr = cur->data;
+                return SUCCESS;
+            }
+            cur = cur->next;
+        }
+        return NOT_FOUND;
+    }
+    else{
+        return NOT_FOUND;
+    }
+}
+
+int hashtable_delete(struct hashtable *ht,void *key)
+{
+    CHECK_ARGUMENT(key);
+
+    int idx = -1;
+    hashtable_node_t *cur = NULL;
+    hashtable_node_t *prev = NULL;
+
+    idx = ht->hash_fun(ht,key);
+    cur = ht->htables[idx];
+
+    while(cur != NULL){
+        if(ht->keycmp(cur->key,key)==0){
+            if(prev != NULL){
+                prev->next = cur->next;
+            }
+            else{
+                ht->htables[idx] = NULL;
+            }
+            ht->hash_node_free(cur);
+            return SUCCESS;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+
+    return NOT_FOUND;
+}
+
+int hashtable_revise(struct hashtable *ht,void *key,void *data)
+{
+
+}
+
 unsigned int hash_table_destory(struct hashtable *ht)
 {
     int i = 0;
@@ -156,7 +230,7 @@ int hash_table_insert(struct hashtable *ht,void *key,void *data)
 
     if( ht == NULL || key == NULL || data == NULL){
         ERROR("invalid arguments");
-        return INTERNAL_ERROR;
+        return INVALID_ARGUMENTS;
     }
 
     idx = ht->hash_fun(ht,key);

@@ -8,7 +8,7 @@
 #include "ckl_ht.h"
 
 #define BUF_LEN (2048)
-#define SAMPLE_SIZE (16)
+#define SAMPLE_SIZE (20)
 int main(int argc,char *argv[])
 {
     hashtable_t *hashtable = NULL;
@@ -49,11 +49,25 @@ int main(int argc,char *argv[])
         }
 #endif //0
 #if 1
-        if( (ret = hashtable->hashtable_insert(hashtable,(void *)employee->name,(void *)employee) ) == INTERNAL_ERROR ){
+        if( (ret = hashtable->hashtable_insert(hashtable,(void *)employee->name,(void *)employee) ) != SUCCESS ){
             free(employee);
         }
 #endif //0
     }
+
+    //dump hashtable
+    hashtable->hashtable_dump(hashtable);
+
+    //search hashtable example
+    char name[NAME_LEN]={0};
+    employee_t *employee_ptr = NULL;
+    snprintf(name,sizeof(name),"M04304%04d",arr[2]);
+    HASHTABLE_SEARCH(hashtable,name,employee_ptr);
+    snprintf(name,sizeof(name),"M04304%04d",arr[30]);
+    HASHTABLE_SEARCH(hashtable,name,employee_ptr);
+
+    //delete hashtable_node_t
+    HASHTABLE_DELETE(hashtable,name);
 
     //dump hashtable
     hashtable->hashtable_dump(hashtable);

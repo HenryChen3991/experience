@@ -45,10 +45,13 @@ typedef struct hashtable
     hash_func_e        hash_func_control;                                   //control using which hash function
     int (*hash_fun)(struct hashtable *ht,const void *key);                  //hashtable used hash function
     int (*keycmp)(const void *key1,const void *key2);                       //key comparison function
-    unsigned int (*hashtable_destory)(struct hashtable *ht);                //free hashtable
-    unsigned int (*hash_node_free)(struct hashtable_node *htNode);          //free hashtable_node
     int (*hashtable_insert)(struct hashtable *ht,void *key,void *data);     //insert data into hashtable
     int (*hashtable_dump)(struct hashtable *ht);                            //dump hashtable
+    int (*hashtable_search)(struct hashtable *ht,void *key,void **ptr);     //search hashtable_node from hashtable
+    int (*hashtable_delete)(struct hashtable *ht,void *key);                //delete hashtable_node from hashtable
+    int (*hashtable_revise)(struct hashtable *ht,void *key,void *data);     //revise hashtable_node from hashtable
+    unsigned int (*hashtable_destory)(struct hashtable *ht);                //free hashtable
+    unsigned int (*hash_node_free)(struct hashtable_node *htNode);          //free hashtable_node
 } hashtable_t;
 
 hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_control);
