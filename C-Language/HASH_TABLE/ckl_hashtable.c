@@ -69,6 +69,7 @@ hashtable_t * hash_table_create(unsigned int slot_size,hash_func_e hash_func_con
     ht->hashtable_dump = hashtable_dump;
     ht->hashtable_search = hashtable_search;
     ht->hashtable_delete = hashtable_delete;
+    ht->hashtable_revise = hashtable_revise;
 
     //initial ht->htables
     for(i = 0; i < slot_size ; i++)
@@ -162,7 +163,22 @@ int hashtable_delete(struct hashtable *ht,void *key)
 
 int hashtable_revise(struct hashtable *ht,void *key,void *data)
 {
+    CHECK_ARGUMENT(key);
+    int idx = -1;
+    hashtable_node_t *cur = NULL;
+    idx = ht->hash_fun(ht,key);
+    cur = ht->htables[idx];
 
+    while(cur != NULL){
+        if(ht->keycmp(cur->key,key)==0){
+            free(cur->data);
+            cur->key = key;
+            cur->data = data;
+            return SUCCESS;
+        }
+        cur = cur->next;
+    }
+    return NOT_FOUND;
 }
 
 unsigned int hash_table_destory(struct hashtable *ht)

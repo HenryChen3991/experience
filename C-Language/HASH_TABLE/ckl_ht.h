@@ -12,6 +12,12 @@ typedef struct{
 
 #define DUMP_EMPLOYEE(ptr) DEBUG("id = %04d , age = %2d , name = %s , phone = %s",ptr->id,ptr->age,ptr->name,ptr->phone);
 
+//member as hashtable key
+#define HASHTABLE_INSET(hashtable,structure,member) \
+    if( (ret=hashtable->hashtable_insert(hashtable,(void *)structure->member,(void *)structure) ) != SUCCESS ){ \
+        free(employee); \
+    }
+
 #define HASHTABLE_SEARCH(hashtable,name,ptr) \
     DEBUG("ready to search for %s ...",name); \
     if( (ret=hashtable->hashtable_search(hashtable,(void *)name,(void *)&ptr)) != SUCCESS ){ \

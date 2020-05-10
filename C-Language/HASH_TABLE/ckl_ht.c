@@ -41,17 +41,10 @@ int main(int argc,char *argv[])
         snprintf(employee->name,sizeof(employee->name),"M04304%04d",employee->id);
         snprintf(employee->phone,sizeof(employee->phone),"093387%04d",employee->id);
         DEBUG("id = %4d , age = %2d , name = %s , phone = %s",employee->id,employee->age,employee->name,employee->phone);
-
-        //if insert fail due to have the same key, need to free the employee, then produce next testing data;
-#if 0
-        if( (ret = hashtable->hashtable_insert(hashtable,(void *)&employee->id,(void *)employee) ) == INTERNAL_ERROR ){
-            free(employee);
-        }
-#endif //0
 #if 1
-        if( (ret = hashtable->hashtable_insert(hashtable,(void *)employee->name,(void *)employee) ) != SUCCESS ){
-            free(employee);
-        }
+        //if insert fail due to have the same key, need to free the employee, then produce next testing data;
+        HASHTABLE_INSET(hashtable,employee,name);
+        //HASHTABLE_INSET(hashtable,employee,id);
 #endif //0
     }
 
@@ -71,6 +64,17 @@ int main(int argc,char *argv[])
 
     //dump hashtable
     hashtable->hashtable_dump(hashtable);
+
+    //revise hashtable someone hashtable_node_t
+    employee_t *employee = (employee_t*)malloc(sizeof(employee_t));
+    employee->id = arr[10];
+    employee->age = rand()%50+18;
+    snprintf(employee->name,sizeof(employee->name),"M04304%04d",employee->id);
+    snprintf(employee->phone,sizeof(employee->phone),"094447%04d",employee->id);
+    DEBUG("new node id = %4d , age = %2d , name = %s , phone = %s",employee->id,employee->age,employee->name,employee->phone);
+    hashtable->hashtable_revise(hashtable,(void *)employee->name,(void *)employee);
+    snprintf(name,sizeof(name),"M04304%04d",arr[10]);
+    HASHTABLE_SEARCH(hashtable,name,employee_ptr);
 
     //destory hashtable
     hashtable->hashtable_destory(hashtable);
