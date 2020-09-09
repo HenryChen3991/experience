@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="./js/jquery-3.5.1.js"></script>
+    <script type="text/javascript">
+	function colorLog(message, color) {
+		color = color || "black";
+		switch (color) {
+			case "green":  
+				 color = "Green"; 
+				 break;
+			case "info":     
+					color = "DodgerBlue";  
+				 break;
+			case "error":   
+				 color = "Red";     
+				 break;
+			case "warning":  
+				 color = "Orange";   
+				 break;
+			default: 
+				 color = color;
+		}
+		console.log("%c" + message, "color:" + color);
+	}
+    function getFunctionName(funcName){
+		//console.log(me);
+		funcName = funcName.substr('function '.length);   
+		funcName = funcName.substr(0, funcName.indexOf('(')); 
+		return funcName;
+	}
+   function wps_akm_click(value){
+	   colorLog("Enter : " + getFunctionName(arguments.callee.toString()),"info");
+	   console.log("option select : "+value);
+	   var output = document.getElementById("output");
+	   var _city2 = document.getElementById("city2");
+	   output.value = "aaaaaaaaaa";
+	   if(value == "Mumbai"){
+		    output.disabled = true;
+			_city2.disabled = true;
+		    console.log("output whether disabled : "+output.disabled);
+		}
+		else{
+			output.disabled = false;
+			_city2.disabled = false;
+			console.log("output whether disabled : "+output.disabled);
+		}
+		colorLog("Exit : " + getFunctionName(arguments.callee.toString()),"info");
+   }
+    </script>
+</head>
+
+<body>
+    <p>偵測option是否切換過</p>
+    <select id="city" class="city" onchange="wps_akm_click(this.options[this.options.selectedIndex].value)">
+        <option value="Pune">Pune</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Nashik">Nashik</option>
+        <option value="Aurangabad">Aurangabad</option>
+    </select>
+	<br>
+	<p>Output:</p>
+	<input id="output" type="text" value="ABCD">
+	<br>
+	<select id="city2" class="city">
+	    <option value="US">US</option>
+	    <option value="UK">Uk</option>
+	</select>
+</body>
+
+</html>

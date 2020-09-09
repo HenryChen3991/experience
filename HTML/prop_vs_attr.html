@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="./js/jquery-3.5.1.js"></script>
+	<script type="text/javascript" src="./js/ckl_util.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+		colorLog($('#c2').attr('checked'),"green");
+		$('#c2').prop('checked',true);
+		console.log($('#c2').prop('checked')); //true
+    });
+    </script>
+</head>
+
+<body>
+		<label><input type="checkbox" id="c1" name="personality">忠诚</label><br>
+        <label><input type="checkbox" id="c2" name="c2">懒惰</label><br>
+        <label><input type="checkbox" id="c3" name="personality">积极</label><br>
+</body>
+
+</html>

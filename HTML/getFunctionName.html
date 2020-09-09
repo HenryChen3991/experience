@@ -1,0 +1,29 @@
+<!DOCTYPE HTML> 
+<html>  
+  
+<head>  
+    <title>  
+        How to get currently running 
+        function name using JavaScript ? 
+    </title>  
+</head>  
+      
+<body style = "text-align:center;">  
+              
+    <h1 style = "color:green;" >  
+        GeeksForGeeks  
+    </h1>  
+          
+    <script>  
+        function GFGs() { 
+            var me = arguments.callee.toString(); 
+			console.log(me);
+            me = me.substr('function '.length);   
+            me = me.substr(0, me.indexOf('('));   
+            console.log(me); 
+        } 
+        GFGs();       
+    </script>  
+</body>  
+  
+</html> 

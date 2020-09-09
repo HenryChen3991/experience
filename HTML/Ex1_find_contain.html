@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="./js/jquery-3.5.1.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $("button").click(function() {
+			console.log("jquery btn click");
+			$(".city").empty();
+			
+            $('.city').find("option:contains(Aurangabad)").toggle(function(){
+            //$("#aa").toggle("slow", function() {
+                if ($('.city').find("option:contains(Aurangabad)").is(":hidden")) {
+                    console.log("The option is visible.");
+                } else {
+                    console.log("The option is hidden.");
+                }
+            });
+            $("#test").toggle("slow", function() {
+                if ($("#test").is(":visible")) {
+                    console.log("test  is visible.");
+                } else {
+                    console.log("test  is hidden.");
+                }
+            });
+			
+        });
+    });
+    </script>
+</head>
+
+<body>
+    <button type="button">切换</button>
+    <p>將option中的選項Aurangabad顯示&隱藏</p>
+    <p id="test">Status:</p>
+    <select id="city" class="city">
+        <option value="1">Pune</option>
+        <option value="2">Mumbai</option>
+        <option value="3">Nashik</option>
+        <option id="aa" value="0">Aurangabad</option>
+    </select>
+</body>
+
+</html>
