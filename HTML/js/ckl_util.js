@@ -16,7 +16,7 @@ function colorLog(message, color) {
 		default: 
 			 color = color;
 	}
-	console.log("%c" + message, "color:" + color);
+	console.log("%c " + message, "color:" + color);
 }
 //get function name
 //example:

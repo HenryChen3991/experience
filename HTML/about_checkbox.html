@@ -1,27 +1,62 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <script type="text/javascript" src="./js/jquery-3.5.1.js"></script>
-    <script type="text/javascript">
+	<head>
+		<script type="text/javascript" src="./js/jquery-3.5.1.js"></script>
+		<script type="text/javascript" src="./js/ckl_util.js"></script>
+		<script type="text/javascript">
+			//set all of checkbox checked prop is true.
+			function setCheckboxChecked(obj) {
+				$(obj).prop("checked", true);
+			}
+			//get all of selected checkbox's value 
+			function getAllSelectedCheckbox(obj){
+				$(obj).each(function() {
+					if ($(this).prop('checked') ==true) {
+						colorLog($(this).val(),"blue");
+					}
+				})
+			}
 
-	//set all of checkbox (personality) default is true.
-	function setCheckboxChecked(obj){
-		console.log(obj);
-		$(obj).prop("checked",true);
-	}
+			function setCheckboxDisable(obj,status){
+				$(obj).each(function() {
+					colorLog("obj = "+obj + " status = "+status,"blue");
+					$(obj).prop("disabled",status);
+				})
+			}
+			$(document).ready(function() {
+				setCheckboxChecked("input[name='personality']");
+				getAllSelectedCheckbox("input[name='personality']");
 
-    $(document).ready(function() {
-		
-		setCheckboxChecked("input[name='personality']");
-    });
-    </script>
-</head>
+				//Testing
+				//set f1 and f3 checked
+				setCheckboxChecked("#f1");
+				setCheckboxChecked("#f3");
 
-<body>
-		<label><input type="checkbox" id="c1" name="personality">忠诚</label><br>
-        <label><input type="checkbox" id="c2" name="c2">懒惰</label><br>
-        <label><input type="checkbox" id="c3" name="personality">积极</label><br>
-</body>
+				setCheckboxDisable("#f1","true");
+
+				$("#f3").click(function(){
+					colorLog("obj = "+true,"blue");
+					setCheckboxDisable("#f3",1);
+				})
+				$("#f2").click(function(){
+					setCheckboxDisable("#f1",0);     //result ok
+					//setCheckboxDisable("#f1",false); //result nok
+				})
+				//setCheckboxDisable("#f1","");
+				//$("#f1").prop('disabled',false);
+			});
+		</script>
+	</head>
+
+	<body>
+		<label><input type="checkbox" id="c1" name="personality" value="忠诚">忠诚</label><br>
+		<label><input type="checkbox" id="c2" name="personality" value="懒惰">懒惰</label><br>
+		<label><input type="checkbox" id="c3" name="personality" value="积极">积极</label><br>
+		<br>
+		<label><input type="checkbox" id="f1" name="fruit" value="apple">apple</label><br>
+		<label><input type="checkbox" id="f2" name="fruit" value="orange">orange</label><br>
+		<label><input type="checkbox" id="f3" name="fruit" value="pineapple">pineapple</label><br>
+	</body>
 
 </html>
