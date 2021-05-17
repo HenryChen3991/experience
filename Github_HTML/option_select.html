@@ -38,12 +38,15 @@
 	   output.value = "aaaaaaaaaa";
 	   if(value == "Mumbai"){
 		    output.disabled = true;
-			_city2.disabled = true;
+			//_city2.disabled = true;
+			$("#city2").children("option[value='UK']").hide();
+			$("#city2").children("option[value='US']").prop("selected",true);
 		    console.log("output whether disabled : "+output.disabled);
 		}
 		else{
 			output.disabled = false;
 			_city2.disabled = false;
+			$("#city2").children().show();
 			console.log("output whether disabled : "+output.disabled);
 		}
 		colorLog("Exit : " + getFunctionName(arguments.callee.toString()),"info");
@@ -64,8 +67,10 @@
 	<input id="output" type="text" value="ABCD">
 	<br>
 	<select id="city2" class="city">
-	    <option value="US">US</option>
-	    <option value="UK">Uk</option>
+	    <option value="US" selected="">US</option>
+	    <option value="UK">UK</option>
+		<option value="JP">JP</option>
+		<option value="KR">KR</option>
 	</select>
 </body>
 

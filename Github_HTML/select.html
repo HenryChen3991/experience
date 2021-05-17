@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script type="text/javascript" src="./js/jquery-3.5.1.js"></script>
+		<script type="text/javascript">
+			var AAA=[];
+			function check_obj_length(obj){
+				if(obj.length == 0 || 'undefined' == typeof(obj) ){
+					console.trace("is 0");
+					return -1;
+				}
+				else {
+					console.debug("line:", /\(file:[\w\d/.-]+:([\d]+)/.exec(new Error().stack)[1]);
+
+					console.trace("is 2");
+					return obj.length;
+					}
+			}
+			function check(){
+				console.log("check")
+				AAA.push("bb");
+				check_obj_length(AAA);
+			}
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<select class="selectOption valid untouched pristine" id="group_access" name="group_access">								
+			<option value="0">read-and-write</option>								
+			<option value="1">read-only</option>							
+		</select>
+		<button onclick="check()">bbb</button>
+		<!--
+		Handler:
+			$("#group_access").find(":selected").val();
+			"0"
+			$("#group_access").find(":selected").val();
+			"1"
+			$('#group_access option[value=1]').attr('selected', 'selected'); //change select option
+			jQuery.fn.init [option, prevObject: jQuery.fn.init(1)]
+			$('#group_access option[value=0]').attr('selected', 'selected'); //change select option
+			jQuery.fn.init [option, prevObject: jQuery.fn.init(1)]
+		-->
+	</body>
+</html>
