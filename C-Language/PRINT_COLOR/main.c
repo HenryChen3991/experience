@@ -21,7 +21,15 @@
 #define WHITE "\033[1;37m"
 
 #define DEBUG(msg,arg...) printf("%15s:%4d " msg"\n",__FILE__,__LINE__,##arg)
-#define DEBUG_COLOR(color,msg,arg...) printf("%s%15s:%4d " msg"%s\n",color,__FILE__,__LINE__,##arg,NONECOLOR)
+#define DBG_COLOR 0
+#if (DBG_COLOR < 1)
+#define DEBUG_COLOR(color,msg,arg...) {}
+#else
+#define DEBUG_COLOR(color,msg,arg...) { \
+                    printf("%s%15s:%4d " msg"%s\n",color,__FILE__,__LINE__,##arg,NONECOLOR); \
+            }
+#endif
+
 
 void main(void)
 {
