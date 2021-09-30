@@ -1,0 +1,69 @@
+hfsprogs (332.14-5) unstable; urgency=low
+
+  * debian/patches: break-up the Gentoo patch into smaller patches.
+  * debian/patches: reorder the patches.
+  * debian/patches: refresh the patches.
+  * debian/patches: remove mention of pdisk (Closes: #482868) (LP: #234749).
+  * debian/control: include Homepage field.
+  * debian/control: update Standards-Version to 3.8.0. No changes required.
+  * debian/control: include DM-Upload-Allowed, as I am a DM now.
+  * debian/control: remove statement about using journals (LP: #164151).
+  * debian/rules: add -Wextra compilation flag.
+  * debian/rules: use quilt.make and remove home-brew solution.
+  * debian/watch: create watch file (lintian warning).
+
+ -- Rog矇rio Brito <rbrito@ime.usp.br>  Tue, 07 Oct 2008 05:08:48 -0300
+
+hfsprogs (332.14-4) unstable; urgency=low
+
+  * debian/changelog: fix typo on Adam's name.
+  * debian/control: include "amd64" as a 64 bit target architecture.
+  * debian/control: include "hppa mips mipsel s390" 32 bit target
+    architectures (Closes: #482070).
+  * debian/control: include "m68k" as another architecture.
+    (Tks: Gerfried Fuchs)
+  * debian/rules: include detection of amd64 and pass information to build
+    process. Warning: the kernel needs to have support/emulation for 32 bit
+    applications enabled. (Tks: Adam C矇cile)
+  * debian/rules: uses $(CURDIR) instead of $(PWD) as per lintian hint.
+  * debian/{lintian-override,rules}: create a lintian override for the
+    license (only the packaging is GPL, not the entire source code).
+
+ -- Rog矇rio Brito <rbrito@ime.usp.br>  Tue, 20 May 2008 18:57:18 -0300
+
+hfsprogs (332.14-3) unstable; urgency=low
+
+  * debian/control: include more 32-bit architectures as requested
+    (Closes: #469151). Despite the fact that there is already a new
+    upstream version, I plan on having it be a team-managed package.
+  * Update to new Debian Policy Standard (no changes).
+
+ -- Rog矇rio Brito <rbrito@ime.usp.br>  Thu, 08 May 2008 17:26:15 -0300
+
+hfsprogs (332.14-2) unstable; urgency=low
+
+  * debian/control: restrict the number of architectures to i386 and powerpc,
+    since the package is not 64 bit clean (compiling on amd64 with option -m32
+    is under study for a future version of the package). See for reference bug
+    #436159 which originated the discussion and for which this is a workaround
+    to be addressed properly later.
+
+ -- Rog矇rio Brito <rbrito@ime.usp.br>  Mon, 03 Dec 2007 20:06:00 -0200
+
+hfsprogs (332.14-1) unstable; urgency=low
+
+  * Initial release (Closes: #433168)
+  * debian/control: add dependency on libssl-dev for the hash functions
+  * debian/control: add dependency on quilt
+  * debian/copyright: included the complete text of the APSL 2.0
+  * debian/links: create links for HFS variants of the utils and manpages
+  * debian/rules: use quilt to patch the source, so we get a Makefile for Linux
+  * debian/patches: incorporated patch from Gentoo to work with quilt
+  * debian/patches: included patch to fix *roff warning
+  * debian/patches: added patch to install bootdata on usr/share correctly
+  * debian/patches: added patch to enable the -a for fsck (Tks: Adam C矇cile)
+  * debian/dirs: added entry for directory mentioned above
+  * debian/rules: added the file for wrapper HFS filesystem
+  * debian/README.Debian: give the URL of the Gentoo instructions
+
+ -- Rog矇rio Brito <rbrito@ime.usp.br>  Fri, 20 Jul 2007 09:37:02 -0300
