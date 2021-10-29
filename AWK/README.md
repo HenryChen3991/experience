@@ -91,12 +91,12 @@ echo "$data"
 	對於`awk '{print $0}' a.txt`
 	它類似於Shell的while循環`while read line;do echo "$line";done <data.txt`
 	awk隐藏了读取每一行的while循环，它会自动读取每一行
-	1. 流程:
-		1. 读取文件第一行
-		1. 将所读取的行赋值给awk的變量$0，於是$0中保存的就是本次所读取的行数据
-		1. 進入代码块{print $0}并執行其中代码print $0
-		1. 執行完本次代码之后，进入下一轮awk循环：继续读取下一行(第二行)，…不断循环，直到读完文件所有数据…
-		1. 退出awk
+	2. 流程:
+		a. 读取文件第一行
+		b. 将所读取的行赋值给awk的變量$0，於是$0中保存的就是本次所读取的行数据
+		c. 進入代码块{print $0}并執行其中代码print $0
+		d. 執行完本次代码之后，进入下一轮awk循环：继续读取下一行(第二行)，…不断循环，直到读完文件所有数据…
+		e. 退出awk
 
 # BEGIN and END代碼區塊
     awk 'BEGIN{print "我在前面"}{print $0}' data.txt
@@ -114,7 +114,56 @@ echo "$data"
 	- END代碼區塊中可以使用$0和其他特殊變量，但是這些特殊變量都是最後一輪awk循環的數據
 
 # Awk命令行結構和語法結構
+	awk的語法充斥著pattern{action}的模式，它們稱為awk rule。
 
+------------
+
+
+	# 特殊pattern
+	BEGIN
+	END
+
+	# 布爾代碼塊
+	/regular expression/    # 正則匹配成功與否 /a.*ef/{action}
+	relational expression   # 即等值比較、大小比較 3>2{action}
+	pattern && pattern      # 邏輯與 3>2 && 3>1 {action}
+	pattern || pattern      # 邏輯或 3>2 || 3<1 {action}
+	! pattern               # 邏輯取反 !/a.*ef/{action}
+	(pattern)               # 改變優先級
+	pattern ? pattern : pattern  # 三目運算符決定的布爾值
+
+	# 範圍pattern，非布爾代碼塊
+	pattern1, pattern2      # 範圍，pat1打開、pat2關閉，即flip,flop模式
+
+
+# 分析awk如何读取文件
+#### awk读取输入文件时，每次读取一条记录(record)(默认情况下按行读取，所以此时记录就是行)。
+#### 每读取一条记录，将其保存到$0中，然后执行一次main代码段。
+	awk '{print $0}' data.txt
+#### 如果是空文件，则因为无法读取到任何一条记录，将导致直接关闭文件，而不会进入main代码段。
+	touch x.log  # 创建一个空文件
+	awk '{print "hello world"}' x.log
+#### 可设置表示输入记录分隔符的预定义变量RS(Record Separator)来改变每次读取的记录模式。
+	# RS="\n" 、 RS="m"
+	awk 'BEGIN{RS="\n"}{print $0}' data.txt
+	awk 'BEGIN{RS="m"}{print $0}' data.txt
+# 分析awk字段分割
+#### awk读取每一条记录之后，会将其赋值给$0，同时还会对这条记录按照预定义变量FS划分字段，将划分好的各个字段分别赋值给$1 $2 $3 $4...$N，同时将划分的字段数量赋值给预定义变量NF
+##### 引用字段的方式
+	$N引用字段：
+		N=0：即$0，引用记录本身
+		0<N<=NF：引用对应字段
+		N>NF：表示引用不存在的字段，返回空字符串
+		N<0：报错
+------------
+	awk '{n = 5;print $n}' data.txt
+![image01](./figures/01.png)
+
+	awk '{print $(2+2)}' data.txt   # 括号必不可少，用于改变优先级
+![image02](./figures/02.png)
+
+	awk '{print $(NF-3)}' data.txt
+![image03](./figures/03.png)
 
 
 
