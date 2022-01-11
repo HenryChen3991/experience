@@ -8,4 +8,7 @@ char * strtrim(char *s);
  */
 char * strtrimc( char * s );
 
-
+void cmsUtl_strToUpper(char *string);
+void cmsUtl_strToLower(char *string);
+int cmsUtl_strcmp(const char *s1, const char *s2);
+void print_bin(int n);
