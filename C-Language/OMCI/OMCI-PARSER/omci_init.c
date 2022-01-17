@@ -12,9 +12,9 @@ const omci_me_modules_t omci_me_modules_list[]={
 const int omci_me_modules_list_size = (sizeof(omci_me_modules_list)/sizeof(omci_me_modules_list[0]));
 
 const omci_action_t omci_action_list[]={
-    {1,0,4,"OLT > Create"},
-    {1,0,8,"OLT > Set"},
-    {0,1,8,"ONU < Set"}
+    {1,0,4,OLT_CREATE},
+    {1,0,8,OLT_SET},
+    {0,1,8,ONU_SET_REP}
 };
 const int omci_action_list_size = (sizeof(omci_action_list)/sizeof(omci_action_list[0]));
 

@@ -11,4 +11,8 @@ char * strtrimc( char * s );
 void cmsUtl_strToUpper(char *string);
 void cmsUtl_strToLower(char *string);
 int cmsUtl_strcmp(const char *s1, const char *s2);
-void print_bin(int n);
+void print_short_type_bin(int n);
+void print_int_type_bin(int n);
+
+char *cmsUtl_strncpy(char *dest, const char *src, int dlen);
+

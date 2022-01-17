@@ -26,9 +26,9 @@ void convert2data(unsigned char *omci,char *raw_omci){
         sscanf(raw_omci, "%2hhx", &omci[i]);
         raw_omci += 2;
     }
-#ifdef OMCI_DBG    
+#ifdef DBG_OMCI    
     print_omci_msg_hex(omci);
-#endif //OMCI_DBG
+#endif //DBG_OMCI
 }
 
 void print_omci_msg_hex(unsigned char *omci)
@@ -69,8 +69,27 @@ const omci_action_t *matching_omci_action_list(msg_type_detail_t msg_type_detail
     return NULL;
 }
 
-void print_attr_name(const unsigned char *attr_name)
+void print_attr_name(const unsigned char *attr_name,int index)
 {
-    DEBUG_COLOR(LIGHT_CYAN,"Enter Attr %s handler",attr_name);
+    DEBUG_COLOR(LIGHT_CYAN,"Enter Attr[%03d] %s handler",index,attr_name);
+}
+
+void print_ocmi_data_and_hex(char *color,const unsigned char *name,const unsigned char *str,int size,int index)
+{
+    int i = 0;
+    //printf("%s%20s:%4d Attr[%03d] %s : %s (",color,__FILE__,__LINE__,index,name,str);
+    printf("%s%20s:%4d Attr[%03d] %s : (",color,__FILE__,__LINE__,index,name);
+    for (i=0; i<size; i++)
+    {
+       printf("%02x",str[i]);
+    }
+    /* //printf char
+    for (i=0; i<size; i++)
+    {
+       if(str[i]>=0x21 && str[i]<=0x7E)
+           printf("%c",str[i]);
+    }
+    */
+    printf("%s)\n",NONECOLOR);
 }
 

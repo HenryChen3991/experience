@@ -72,6 +72,34 @@ extern const int omci_me_modules_list_size;
 void dbg_omci_me_modules_list(void);
 void dbg_module_info(omci_me_modules_t *module);
 
+typedef union VLANTaggingOperationTableMapping
+{
+    unsigned int word[4];
+    struct{
+        unsigned int word1Padding :12;
+        unsigned int filterOuterTpidde :3;
+        unsigned int filterOuterVid :13;
+        unsigned int filterOuterPrio :4;
+
+        unsigned int filterEtherType :4;
+        unsigned int word2Padding :8;
+        unsigned int filterInnerTpidde :3;
+        unsigned int filterInnerVid :13;
+        unsigned int filterInnerPrio :4;
+
+        unsigned int treatmentOuterTpidde :3;
+        unsigned int treatmentOuterVid :13;
+        unsigned int treatmentOuterPrio :4;
+        unsigned int word3Padding :10;
+        unsigned int treatmentTagsRemove :2;
+
+        unsigned int treatmentInnerTpidde :3;
+        unsigned int treatmentInnerVid :13;
+        unsigned int treatmentInnerPrio :4;
+        unsigned int word4Padding :12;
+    };
+} VLANTaggingOperationTableMapping_t;
+
 /**
  *
  */
@@ -86,15 +114,24 @@ void me_9_3_13_parser(omci_t *omci,const unsigned char *meName);
 #define ME_9_3_13 (171)
 
 #define ATTR_MASK_LEN (16)
+#define ATTR_MASK_SIZE_BYTE (2)
 
 /**
  *
  */
 typedef struct omci_attr_handler
 {
-    unsigned int attr_num;
-    unsigned char attr_name[BUFLEN_128];
-    void (*handler)(unsigned char *content,unsigned char *attr_name);
+    unsigned int  num;
+    unsigned char name[BUFLEN_128];
+    unsigned int  size;
+    void (*handler)(unsigned char *content,unsigned char *attr_name,unsigned int size,int index);
 } omci_attr_handler_t;
+
+#define OMCI_PACKET_MT_MAX (32)
+
+#define OLT_SET "OLT > Set"
+#define ONU_SET_REP "ONU < Set"
+#define OLT_CREATE "OLT > Create"
+
 #endif //OMCI_INIT_H
 

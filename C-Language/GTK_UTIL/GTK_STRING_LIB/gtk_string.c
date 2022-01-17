@@ -87,9 +87,9 @@ int cmsUtl_strcmp(const char *s1, const char *s2)
    return strcmp(str1, str2);
 }
 
-void print_bin(int n)
+void print_short_type_bin(int n)
 {
-    int l = sizeof(n)*8;//總位數。
+    int l = sizeof(short)*8;//總位數。
     int i;
     printf("%s",LIGHT_CYAN);
     if(i == 0)
@@ -99,11 +99,64 @@ void print_bin(int n)
      }
     for(i = l-1; i >= 0; i --)//略去高位0.
     {
+        printf("0");
         if(n&(1<<i)) break;
     }
  
     for(;i>=0; i --)
         printf("%d", (n&(1<<i)) != 0);
     printf("%s\n",NONECOLOR);
+}
+
+void print_int_type_bin(int n)
+{
+    int l = sizeof(int)*8;//總位數。
+    int i;
+    printf("%s",LIGHT_CYAN);
+    if(i == 0)
+    {
+         printf("0");
+         return;
+     }
+    for(i = l-1; i >= 0; i --)//略去高位0.
+    {
+        printf("0");
+        if(n&(1<<i)) break;
+    }
+ 
+    for(;i>=0; i --)
+        printf("%d", (n&(1<<i)) != 0);
+    printf("%s\n",NONECOLOR);
+}
+
+char *cmsUtl_strncpy(char *dest, const char *src, int dlen)
+{
+
+   /* if the dest ptr is NULL, we cannot copy at all.  Return now */
+   if (dest == NULL)
+   {
+      ERROR("dest is NULL!");
+      return NULL;
+   }
+
+   /* if src ptr is NULL, copy an empty string to dest */
+   if (src == NULL)
+   {
+      return strcpy(dest, "");
+      return dest;
+   }
+
+   /* do a modified strncpy by making sure dest is NULL terminated */
+   if( strlen(src)+1 > (unsigned int) dlen )
+   {
+      NOTICE("truncating:src string length > dest buffer");
+      strncpy(dest,src,dlen-1);
+      dest[dlen-1] ='\0';
+   }
+   else
+   {
+      strcpy(dest,src);
+   }
+   return dest;
 }
 

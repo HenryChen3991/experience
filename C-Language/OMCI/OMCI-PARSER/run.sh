@@ -4,4 +4,4 @@ make clean
 
 make
 
-./omciparser omci.txt
+./omciparser me171-omci.txt
