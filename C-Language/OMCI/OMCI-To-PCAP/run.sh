@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OBJ="omci-pa"
+OBJ="bbn-omci"
 
 
 make clean
@@ -14,3 +14,6 @@ echo -e "\nOmci.pcap:"
 
 echo -e "\ntext2pcap $OBJ.pcap.format $OBJ.pcap:"
 text2pcap $OBJ.pcap.format $OBJ.pcap
+
+mkdir -p exe-$OBJ
+mv $OBJ.* exe-$OBJ

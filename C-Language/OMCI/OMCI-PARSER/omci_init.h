@@ -133,5 +133,13 @@ typedef struct omci_attr_handler
 #define ONU_SET_REP "ONU < Set"
 #define OLT_CREATE "OLT > Create"
 
+typedef enum{
+    NORMANL = 0,
+    FILTER = 1,
+    MEREPLAY = 2
+} omciparser_mode_e;
+
+extern const char *omciParser_mode_name[];
+
 #endif //OMCI_INIT_H
 

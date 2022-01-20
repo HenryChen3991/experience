@@ -5,6 +5,12 @@
 
 #include "omci.h"
 
+const char *omciParser_mode_name[]={
+    "Normal Mode",
+    "Filter Mode",
+    "MeReplay Mode"
+};
+
 const omci_me_modules_t omci_me_modules_list[]={
     {"OLT-G",ME_9_12_2,me_9_12_2_parser},
     {"Extended VLAN tagging operation configuration data",ME_9_3_13,me_9_3_13_parser}

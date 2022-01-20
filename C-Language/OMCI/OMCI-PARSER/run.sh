@@ -4,4 +4,31 @@ make clean
 
 make
 
-./omciparser me171-omci.txt
+MODE=""
+
+if [ ! -f "$1" ];then
+    echo -e "$1 not exist"
+    exit 1;
+fi
+
+if [ "$2" == "-f" ];
+then
+    if [ "$3" == "" ]; then
+        echo -e "args not valid"
+        exit 1;
+    fi
+    MODE="Filter"
+elif [ "$2" == "-MEReplay" ]
+then
+    MODE="MEreplay"
+fi
+
+if [ "$MODE" == "Filter" ];
+then
+    ./omciparser $1 -f $3
+elif [ "$MODE" == "MEreplay" ];
+then
+    ./omciparser $1 -MEReplay
+    echo -e "\nOutput Result:"
+    cat $1-replay
+fi

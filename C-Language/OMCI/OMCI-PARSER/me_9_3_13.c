@@ -105,7 +105,7 @@ void dbg_VLANTaggingOperationTableMapping(VLANTaggingOperationTableMapping_t m){
     
     DEBUG_COLOR(LIGHT_GREEN,"word[2] filterInnerPrio      - %08x - %d",m.filterInnerPrio,m.filterInnerPrio);
     DEBUG_COLOR(LIGHT_GREEN,"word[2] filterInnerVid       - %08x - %d",m.filterInnerVid,m.filterInnerVid);
-    //DEBUG_COLOR(LIGHT_GREEN,"word[2] filterInnerTpidde    - %08x - %d",m.filterInnerTpidde,m.filterInnerTpidde);
+    DEBUG_COLOR(LIGHT_GREEN,"word[2] filterInnerTpidde    - %08x - %d",m.filterInnerTpidde,m.filterInnerTpidde);
     //DEBUG_COLOR(LIGHT_GREEN,"word[2] word2Padding         - %08x - %d",m.word2Padding,m.word2Padding);
     DEBUG_COLOR(LIGHT_GREEN,"word[2] filterEtherType      - %08x - %d",m.filterEtherType,m.filterEtherType);
     printf("\n");

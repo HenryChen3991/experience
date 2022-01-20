@@ -7,11 +7,12 @@
 //#define DBG_OMCI 1
 //#define DBG_ATTRMASK 1
 
-void parser_omci_msg( char *raw_omci,int index);
+void parser_omci_msg( char *raw_omci,int index,int mode,int filter_me);
 void dbg_omci_packet_format(omci_t *omci);
 void print_omci_msg_hex(unsigned char *omci);
 void convert2data(unsigned char *omci,char *raw_omci);
 const omci_action_t * matching_omci_action_list(msg_type_detail_t msg_type_detail);
+Ret replay_omci_msg(char *raw_omci,int index,FILE *outfp);
 
 #define GET_ATTR_INDEX(mask,index) \
 ({ \

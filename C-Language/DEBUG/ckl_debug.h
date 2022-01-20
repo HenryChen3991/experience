@@ -64,13 +64,15 @@
 //define enum ret
 typedef enum
 {
-	INITIALIZATION       = -1,    //< Iintialization
-	CMSRET_SUCCESS       = 0,     //< Success
-	METHOD_NOT_SUPPORTED = 9000,  //< Method not supported
-	REQUEST_DENIED       = 9001,  //< Request denied (no reason specified)
-	INTERNAL_ERROR       = 9002,  //< Internal error
-	INVALID_ARGUMENTS    = 9003,  //< Invalid arguments
-	NOT_FOUND            = 9004,  //< Not Found
+	INITIALIZATION           = -1,    //< Iintialization
+	CMSRET_SUCCESS           = 0,     //< Success
+	METHOD_NOT_SUPPORTED     = 9000,  //< Method not supported
+	REQUEST_DENIED           = 9001,  //< Request denied (no reason specified)
+	INTERNAL_ERROR           = 9002,  //< Internal error
+	INVALID_ARGUMENTS        = 9003,  //< Invalid arguments
+	NOT_FOUND                = 9004,  //< Not Found
+	MATCH_MEREPLAY_RULES     = 9005,  //< Match MeReplay Rules
+	NOT_MATCH_MEREPLAY_RULES = 9006,
 } Ret;
 
 /**
