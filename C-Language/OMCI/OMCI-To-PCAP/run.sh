@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OBJ="bbn-omci"
+OBJ="bbn-omci-zhang"
 
 
 make clean

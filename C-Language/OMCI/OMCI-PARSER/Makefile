@@ -1,7 +1,8 @@
 ME_9_3_OBJS = me_9_3_13.o
 ME_9_12_OBJS = me_9_12_2.o
+ME_65305_OBJS = me_65305.o
 
-OBJ = omciparser.o omci.o omci_init.o omci_util.o $(ME_9_12_OBJS) $(ME_9_3_OBJS)
+OBJ = omciparser.o omci.o omci_init.o omci_util.o $(ME_9_12_OBJS) $(ME_9_3_OBJS) $(ME_65305_OBJS)
 APP = omciparser
 LIBS = -lgtk_string
 

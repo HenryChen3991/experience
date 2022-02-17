@@ -5,7 +5,7 @@
  * Define DBG_OMCI_FLAG Cnntrol
  */
 //#define DBG_OMCI 1
-//#define DBG_ATTRMASK 1
+#define DBG_ATTRMASK 1
 
 void parser_omci_msg( char *raw_omci,int index,int mode,int filter_me);
 void dbg_omci_packet_format(omci_t *omci);

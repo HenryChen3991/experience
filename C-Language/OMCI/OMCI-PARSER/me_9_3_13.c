@@ -134,14 +134,20 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
         return;
     }
 
-    //part 2
+        //part 2
     if(m->filterOuterPrio != 15 && m->filterOuterVid != 4096){
-        printf("%d-",m->filterOuterVid);
+        printf("%d",m->filterOuterVid);
+        if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+            printf("/%d",m->filterOuterPrio);
+        printf("-");
         outerf = 1;
     }
 
     if(m->filterInnerPrio != 15 && m->filterInnerVid != 4096){
-        printf("%d-",m->filterInnerVid);
+        printf("%d",m->filterInnerVid);
+        if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+            printf("/%d",m->filterInnerPrio);
+        printf("-");
         innerf = 1;
     }
     printf("F --> ");
@@ -151,32 +157,64 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
         if(m->treatmentOuterPrio != 15){
 
             if(m->treatmentOuterVid == 4096){
-                printf("%d-",m->filterInnerVid);
+                printf("%d",m->filterInnerVid);
             }
             else if(m->treatmentOuterVid == 4097){
-                printf("%d-",m->filterOuterVid);
+                printf("%d",m->filterOuterVid);
             }
             else{
-                printf("%d-",m->treatmentOuterVid);
-            }           
+                printf("%d",m->treatmentOuterVid);
+            }
+
+            //pbit part
+            if(m->treatmentOuterPrio>=0 && m->treatmentOuterPrio<=7)
+                printf("/%d",m->treatmentOuterPrio);
+            else if(m->treatmentOuterPrio == 8){
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
+            }
+            else if(m->treatmentOuterPrio == 9){
+                if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+                    printf("/%d",m->filterOuterPrio);
+            }
+            printf("-");
         }
         if(m->treatmentInnerPrio != 15){
 
             if(m->treatmentInnerVid == 4096){
-                printf("%d-",m->filterInnerVid);
+                printf("%d",m->filterInnerVid);
             }
             else if(m->treatmentOuterVid == 4097){
-                printf("%d-",m->filterOuterVid);
+                printf("%d",m->filterOuterVid);
             }
             else{
-                printf("%d-",m->treatmentInnerVid);
+                printf("%d",m->treatmentInnerVid);
             }
+
+            //pbit part
+            if(m->treatmentInnerPrio>=0 && m->treatmentInnerPrio<=7)
+                printf("/%d",m->treatmentInnerPrio);
+            else if(m->treatmentInnerPrio == 8){
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
+            }
+            else if(m->treatmentInnerPrio == 9){
+                if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+                    printf("/%d",m->filterOuterPrio);
+            }
+            printf("-");
         }
         if(outerf){
-            printf("%d-",m->filterOuterVid);
+            printf("%d",m->filterOuterVid);
+            if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+                printf("/%d",m->filterOuterPrio);
+            printf("-");
         }
         if(innerf){
-            printf("%d-",m->filterInnerVid);
+            printf("%d",m->filterInnerVid);
+            if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                printf("/%d",m->filterInnerPrio);
+            printf("-");
         }
         printf("F");
     }
@@ -184,35 +222,66 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
         if(m->treatmentOuterPrio != 15){
 
             if(m->treatmentOuterVid == 4096){
-                printf("%d-",m->filterInnerVid);
+                printf("%d",m->filterInnerVid);
             }
             else if(m->treatmentOuterVid == 4097){
-                printf("%d-",m->filterOuterVid);
+                printf("%d",m->filterOuterVid);
             }
             else{
-                printf("%d-",m->treatmentOuterVid);
+                printf("%d",m->treatmentOuterVid);
             }
 
-            if(outerf && innerf){
-                printf("%d-",m->filterInnerVid);
+            //pbit part
+            if(m->treatmentOuterPrio>=0 && m->treatmentOuterPrio<=7)
+                printf("/%d",m->treatmentOuterPrio);
+            else if(m->treatmentOuterPrio == 8){
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
             }
-            
+            else if(m->treatmentOuterPrio == 9){
+                if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+                    printf("/%d",m->filterOuterPrio);
+            }
+            printf("-");
+
+            if(outerf && innerf){
+                printf("%d",m->filterInnerVid);
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
+                printf("-");
+            }
         }
 
         if(m->treatmentInnerPrio != 15){
 
             if(m->treatmentInnerVid == 4096){
-                printf("%d-",m->filterInnerVid);
+                printf("%d",m->filterInnerVid);
             }
             else if(m->treatmentOuterVid == 4097){
-                printf("%d-",m->filterOuterVid);
+                printf("%d",m->filterOuterVid);
             }
             else{
-                printf("%d-",m->treatmentInnerVid);
+                printf("%d",m->treatmentInnerVid);
             }
 
+            //pbit part
+            if(m->treatmentInnerPrio>=0 && m->treatmentInnerPrio<=7)
+                printf("/%d",m->treatmentInnerPrio);
+            else if(m->treatmentInnerPrio == 8){
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
+            }
+            else if(m->treatmentInnerPrio == 9){
+                if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+                    printf("/%d",m->filterOuterPrio);
+            }
+            printf("-");
+
             if(outerf && innerf){
-                printf("%d-",m->filterInnerVid);
+                printf("%d",m->filterInnerVid);
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
+                printf("-");
             }
         }
         printf("F");
@@ -221,26 +290,52 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
         if(m->treatmentOuterPrio != 15){
 
             if(m->treatmentOuterVid == 4096){
-                printf("%d-",m->filterInnerVid);
+                printf("%d",m->filterInnerVid);
             }
             else if(m->treatmentOuterVid == 4097){
-                printf("%d-",m->filterOuterVid);
+                printf("%d",m->filterOuterVid);
             }
             else{
-                printf("%d-",m->treatmentOuterVid);
-            }           
+                printf("%d",m->treatmentOuterVid);
+            }
+
+            //pbit part
+            if(m->treatmentOuterPrio>=0 && m->treatmentOuterPrio<=7)
+                printf("/%d",m->treatmentOuterPrio);
+            else if(m->treatmentOuterPrio == 8){
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
+            }
+            else if(m->treatmentOuterPrio == 9){
+                if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+                    printf("/%d",m->filterOuterPrio);
+            }
+            printf("-");
         }
         if(m->treatmentInnerPrio != 15){
 
             if(m->treatmentInnerVid == 4096){
-                printf("%d-",m->filterInnerVid);
+                printf("%d",m->filterInnerVid);
             }
             else if(m->treatmentOuterVid == 4097){
-                printf("%d-",m->filterOuterVid);
+                printf("%d",m->filterOuterVid);
             }
             else{
-                printf("%d-",m->treatmentInnerVid);
+                printf("%d",m->treatmentInnerVid);
             }
+
+            //pbit part
+            if(m->treatmentInnerPrio>=0 && m->treatmentInnerPrio<=7)
+                printf("/%d",m->treatmentInnerPrio);
+            else if(m->treatmentInnerPrio == 8){
+                if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
+                    printf("/%d",m->filterInnerPrio);
+            }
+            else if(m->treatmentInnerPrio == 9){
+                if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
+                    printf("/%d",m->filterOuterPrio);
+            }
+            printf("-");
         }
         printf("F");
     }

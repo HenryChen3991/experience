@@ -21,6 +21,8 @@ then
 elif [ "$2" == "-MEReplay" ]
 then
     MODE="MEreplay"
+else
+    MODE="Normal"
 fi
 
 if [ "$MODE" == "Filter" ];
@@ -31,4 +33,7 @@ then
     ./omciparser $1 -MEReplay
     echo -e "\nOutput Result:"
     cat $1-replay
+elif [ "$MODE" == "Normal" ];
+then
+    ./omciparser $1
 fi

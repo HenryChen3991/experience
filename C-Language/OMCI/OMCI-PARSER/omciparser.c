@@ -49,6 +49,10 @@ static void analyze_parameter(int argc, char *argv[],int *mode,int *filter_me)
         DEBUG("mode = %s",omciParser_mode_name[*mode]);
         i+=1;
     }
+    else{
+        *mode = NORMANL;
+         DEBUG("mode = %s",omciParser_mode_name[*mode]);
+    }
 }
 
 Ret omciparser(char *Infile,int mode,int filter_me){

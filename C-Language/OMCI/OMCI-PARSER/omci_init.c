@@ -13,7 +13,8 @@ const char *omciParser_mode_name[]={
 
 const omci_me_modules_t omci_me_modules_list[]={
     {"OLT-G",ME_9_12_2,me_9_12_2_parser},
-    {"Extended VLAN tagging operation configuration data",ME_9_3_13,me_9_3_13_parser}
+    {"Extended VLAN tagging operation configuration data",ME_9_3_13,me_9_3_13_parser},
+    {"Downstream VLAN Tag Egress Behavior Supplemental",ME_65305,me_65305_parser}
 };
 const int omci_me_modules_list_size = (sizeof(omci_me_modules_list)/sizeof(omci_me_modules_list[0]));
 

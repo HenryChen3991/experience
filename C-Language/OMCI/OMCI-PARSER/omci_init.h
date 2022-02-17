@@ -101,23 +101,25 @@ typedef union VLANTaggingOperationTableMapping
 } VLANTaggingOperationTableMapping_t;
 
 /**
- *
+ * ME PARSER FUNCTION
  */
 void me_9_12_2_parser(omci_t *omci,const unsigned char *meName);
 void me_9_3_13_parser(omci_t *omci,const unsigned char *meName);
+void me_65305_parser(omci_t *omci,const unsigned char *meName);
 
 
 /**
- *
+ * ME NUMBER DEFINE
  */
 #define ME_9_12_2 (131)
 #define ME_9_3_13 (171)
+#define ME_65305 (65305)
 
 #define ATTR_MASK_LEN (16)
 #define ATTR_MASK_SIZE_BYTE (2)
 
 /**
- *
+ * OMCI ATTR HANDLER
  */
 typedef struct omci_attr_handler
 {

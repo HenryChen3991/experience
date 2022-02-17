@@ -18,10 +18,11 @@ void parser_omci_msg(char *raw_omci,int index,int mode,int filter_me)
 
     omci_t *omci = (omci_t*)omci_data;
 
-    if(filter_me != htons(omci->meid)){
-        return ;
+    if(mode == FILTER){
+        if(filter_me != htons(omci->meid)){
+            return ;
+        }
     }
-
     for(i=0;i<omci_me_modules_list_size;i++){
         if(omci_me_modules_list[i].meId == htons(omci->meid)){
             module = &omci_me_modules_list[i];

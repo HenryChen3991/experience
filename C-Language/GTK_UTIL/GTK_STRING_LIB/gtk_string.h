@@ -15,4 +15,5 @@ void print_short_type_bin(int n);
 void print_int_type_bin(int n);
 
 char *cmsUtl_strncpy(char *dest, const char *src, int dlen);
+int hex2int(char *hex);
 
