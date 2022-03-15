@@ -1,0 +1,72 @@
+#***********************************************************************
+#
+#  Copyright (c) 2012  Broadcom Corporation
+#  All Rights Reserved
+#
+#***********************************************************************/
+
+all dynamic install: conditional_build
+
+#
+# Set our CommEngine directory (by splitting the pwd into two words
+# at /userspace and taking the first word only).
+# Then include the common defines under CommEngine.
+# You do not need to modify this part.
+#
+CURR_DIR := $(shell pwd)
+BUILD_DIR:=$(subst /userspace, /userspace,$(CURR_DIR))
+BUILD_DIR:=$(word 1, $(BUILD_DIR))
+
+include $(BUILD_DIR)/make.common
+
+UNTAR_COMPLETE_FILE = .untar_complete
+CONFIG_COMPLETE_FILE = config_complete
+
+APP = libunwind-1.6.2
+LIB := libunwind
+
+ifneq ($(strip $(BUILD_MPTCP)),)
+
+$(APP)/$(UNTAR_COMPLETE_FILE): $(APP).tar.gz Makefile
+	rm -rf $(APP)
+	(tar xkf $(APP).tar.gz 2> /dev/null || true);
+	@echo "$(APP) is untarred"
+	touch $(APP)/$(UNTAR_COMPLETE_FILE)
+
+$(APP)/$(CONFIG_COMPLETE_FILE): $(APP)/$(UNTAR_COMPLETE_FILE) 
+	(cd $(APP); ./configure \
+		--host=arm-linux-gnueabihf \
+		--prefix=$(BCM_FSBUILD_DIR)/public/libunwind-1.6.2 \
+	    CFLAGS=-s\ -Os\ -Wno-strict-aliasing || exit 1);
+	@echo "$(APP) is configured"
+	touch $(APP)/$(CONFIG_COMPLETE_FILE)
+
+conditional_build: $(APP)/$(CONFIG_COMPLETE_FILE) sanity_check
+	$(MAKE) -C $(APP)
+	mkdir -p $(BCM_FSBUILD_DIR)/public/$(APP)/lib/
+	$(MAKE) -C $(APP) install
+	cp -f $(BCM_FSBUILD_DIR)/public/$(APP)/lib/$(LIB)*so* $(INSTALL_DIR)/lib/
+	echo "Done building $(APP)"
+else
+conditional_build: sanity_check
+	@echo "skipping $(APP) (not configured)"
+endif
+
+# NOTE: make clean from within app does not do a proper job, so wiping out
+# entire directory to ensure consistency.
+clean: 
+	rm -rf $(BCM_FSBUILD_DIR)/public/$(APP)
+	rm -rf $(INSTALL_DIR)/lib/$(LIB)*so*
+	#@if [ -e $(APP)/Makefile ]; then \
+	#	$(MAKE) -C $(APP) uninstall; \
+	#	$(MAKE) -C $(APP) distclean; \
+	#fi
+	rm -rf $(APP)
+
+# The next line is a hint to our release scripts
+# GLOBAL_RELEASE_SCRIPT_CALL_DISTCLEAN
+distclean: clean
+
+shell:
+	bash
+

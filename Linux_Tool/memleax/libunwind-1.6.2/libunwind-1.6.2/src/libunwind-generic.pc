@@ -1,0 +1,11 @@
+prefix=/home/ssd/henry/BELKIN/Belkin_Pepper/targets/96750GW_PCCW/fs.build/public/libunwind-1.6.2
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libunwind-generic
+Description: libunwind generic library
+Version: 1.6.2
+Requires: libunwind
+Libs: -L${libdir} -lunwind-generic
+Cflags: -I${includedir}

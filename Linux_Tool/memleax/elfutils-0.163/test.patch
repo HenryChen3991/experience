@@ -1,0 +1,11 @@
+--- libelf/elf_getarsym.c	2022-03-14 14:55:28.382632808 +0800
++++ elf_getarsym_new.c	2022-03-14 14:54:54.567104050 +0800
+@@ -169,7 +169,7 @@ elf_getarsym (elf, ptr)
+ 
+       /* We have an archive.  The first word in there is the number of
+ 	 entries in the table.  */
+-      uint64_t n;
++      uint64_t n = 0;
+       size_t off = elf->start_offset + SARMAG + sizeof (struct ar_hdr);
+       if (read_number_entries (&n, elf, &off, index64_p) < 0)
+ 	{
