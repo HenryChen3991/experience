@@ -1,0 +1,4 @@
+dependson: public/libs/elfutils-0.163 public/libs/libunwind-1.6.2
+
+
+condition: ifneq ($(strip $(RETAIL_GEMTEK)),)
