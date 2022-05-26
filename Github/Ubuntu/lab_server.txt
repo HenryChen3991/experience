@@ -1,0 +1,100 @@
+##DHCPv6
+sudo dhcpd -6 -f -cf /etc/dhcp/dhcpd6.conf eth1 & 
+##DHCPv4
+sudo dhcpd -user dhcpd -group dhcpd -f -4 -pf /run/dhcp-server/dhcpd.pid -cf /etc/dhcp/dhcpd.conf eth1 &
+
+##PPPOE
+sudo poff dsl-provider # 關閉撥號
+sudo pon dsl-provider # 開啟撥號
+
+#PPPOE Server
+sudo pppoe-server -I eth1:5_PPPOE -L 20.36.1.20 -R 20.36.1.100 -N 50
+
+透過iptables-save和ip6tables-save指令，儲存到/etc/iptables/rules.v4和/etc/iptables/rules.v6檔案中。
+如此一來，Ubuntu Server在開機時，就會自動使用iptables-restore和ip6tables-restore指令來套用/etc/iptables/rules.v4和/etc/iptables/rules.v6中儲存的設定
+
+##NAT feature
+#dhcp  v6
+sudo ip6tables -t nat -A POSTROUTING -s 2002:1234:5678::/64 -j MASQUERADE
+#pppoe v6
+sudo ip6tables -t nat -A POSTROUTING -s 2020:1234:5678::/64 -j MASQUERADE
+
+sudo iptables -t nat -A POpSTROUTING -s 10.36.1.0/24 -o ppp0 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -s 20.36.1.0/24 -j MASQUERADE
+
+
+##Restart service
+sudo vi /etc/network/interfaces
+sudo service networking start
+
+sudo systemctl start radvd
+sudo /etc/init.d/radvd start
+
+##NOIP DDNS
+sudo /usr/local/bin/noip2 -c /usr/local/etc/no-ip2.conf
+
+##block ssh login from non-company network
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j DROP
+
+
+##Alias
+使用alias指令來建立的alias並不會永久保存，Terminal重開就會發現之前建立的都不見了。
+若想要將alias永久保存，請按照下面步驟：
+１．打開Terminal並且瀏覽HOME目錄
+２．輸入ls -a指令來查看所有隱藏檔案，若資料太多難以查看可以改用ls -al指令
+３．使用自己喜歡的文字編輯器修改.bash_aliases或.bash_profile或.bashrc其中之一，若沒有任何上述檔案可以使用touch指令建立其中一個，例如：touch .bash_aliases
+４．儲存並回到Terminal後，使用source指令重新載入檔案
+５．source指令跑完後記得使用alias指令查看有沒有成功唷～
+
+
+
+
+###Protection DDoS
+### 1：丟棄無效數據包###
+/sbin/iptables -t mangle -A PREROUTING -m conntrack --ctstate INVALID -j DROP  
+
+### 2：丟棄新的且不是 SYN 的 TCP 數據包 ###
+/sbin/iptables -t mangle -A PREROUTING -p tcp ！--syn -m conntrack --ctstate NEW -j DROP
+ 
+### 3：丟棄具有可疑 MSS 值的 SYN 數據包###
+/sbin/iptables -t mangle -A PREROUTING -p tcp -m conntrack --ctstate NEW -m tcpmss ！--mss 536:65535 -j 刪除  
+
+### 4：阻止帶有虛假 TCP 標誌的數據包###
+/sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags FIN,SYN FIN,SYN -j DROP 
+/sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags SYN,RST SYN, RST -j DROP 
+/sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags FIN,RST FIN,RST -j DROP 
+/sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags FIN ,ACK FIN -j DROP 
+/sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags ACK,URG URG -j DROP 
+/sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags ACK ,PSH PSH -j DROP 
+/sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags ALL NONE -j DROP
+
+### 5：阻止欺騙性數據包###
+/sbin/iptables -t mangle -A PREROUTING -s 224.0.0.0/3 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 169.254.0.0/16 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 172.16.0.0/12 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 192.0.2.0/24 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 192.168.0.0/16 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 10.0.0.0/8 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 0.0.0.0/8 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 240.0.0.0/5 -j DROP
+/sbin/iptables -t mangle -A PREROUTING -s 127.0.0.0/8 ！-i lo -j 刪除  
+
+### 6：丟棄 ICMP（您通常不需要此協議）###
+/sbin/iptables -t mangle -A PREROUTING -p icmp -j DROP  
+
+### 7：在所有鏈中丟棄片段###
+/sbin/iptables -t mangle -A PREROUTING -f -j DROP  
+
+### 8：限制每個源 IP 的連接數 ###
+/sbin/iptables -A INPUT -p tcp -m connlimit --connlimit-above 111 -j REJECT --reject-with tcp-reset  
+
+### 9：限制RST數據包###
+/sbin/iptables -A INPUT -p tcp --tcp-flags RST RST -m limit --limit 2/s --limit-burst 2 -j ACCEPT
+/sbin/iptables -A INPUT -p tcp --tcp-flags RST RST -j DROP  
+
+### 10：限制每個源 IP 每秒的新 TCP 連接數 ###
+/sbin/iptables -A INPUT -p tcp -m conntrack --ctstate NEW -m limit --limit 60/s --limit-burst 20 -j ACCEPT
+/sbin/iptables -A INPUT -p tcp -m conntrack --ctstate NEW -j DROP  
+
+### 11：在所有端口上使用 SYNPROXY（禁用連接限制規則）###
+# 隱藏 - 解鎖上面“使用 SYNPROXY 緩解 SYN 洪水”部分中的內容
