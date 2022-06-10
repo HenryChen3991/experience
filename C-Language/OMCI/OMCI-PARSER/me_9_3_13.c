@@ -19,6 +19,8 @@ void me_171_attr_8_handler(unsigned char *content,unsigned char *attr_name,unsig
 
 void parser_received_frame_VLAN_tagging_operation_table(unsigned char *receivedFrameVLANTaggingOperationTable,int size);
 void dbg_VLANTaggingOperationTableMapping(VLANTaggingOperationTableMapping_t m);
+void parser_dscpToPbitMapping(unsigned char* dscpToPbitMapping);
+
 void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m);
 static omci_attr_handler_t omci_attr_handler_list[]={
     {0  ,"Managed entity ID"                                             ,2  ,NULL},
@@ -61,14 +63,80 @@ void me_171_attr_6_handler(unsigned char *content,unsigned char *attr_name,unsig
 }
 void me_171_attr_7_handler(unsigned char *content,unsigned char *attr_name,unsigned int size,int index)
 {
-    print_attr_name(attr_name,index);
+    print_attr_name(attr_name,index);
 }
 
 void me_171_attr_8_handler(unsigned char *content,unsigned char *attr_name,unsigned int size,int index)
 {
-   print_attr_name(attr_name,index);
+    print_attr_name(attr_name,index);
+    unsigned char dscpToPbitMapping[24];
+    memcpy(dscpToPbitMapping,content,size);
+    print_ocmi_data_and_hex(LIGHT_CYAN,attr_name,dscpToPbitMapping,size,index);
+    parser_dscpToPbitMapping(dscpToPbitMapping);
 }
 
+/**
+ * Step 1 : each three byte combine to a integer data
+ * src[0]       = 0x      92
+ * src[1]       = 0x      49
+ * src[2]       = 0x      24
+ * groups[i]    = 0x00924924
+ *
+ * groups[i]    = 00000000100100100100100100100100
+ * Step 2 : data & 0x7 to get three bit data and then shift 3 bit
+ */
+
+/** Size of intermediate array for DSCP conversion */
+#define DSCP_CONVERSION_GROUPS 8
+#define DSCP_MAX 64
+
+void parser_dscpToPbitMapping(unsigned char* src){
+    DEBUG_COLOR(LIGHT_GREEN,"Enter parser_dscpToPbitMapping");
+    unsigned int mapping[64]={0};
+    int i, j, k;
+    unsigned int groups[DSCP_CONVERSION_GROUPS]={0};
+    /* Group bits into 8 x 24 bit groups */
+	j = 0;
+	for (i = 0; i < DSCP_CONVERSION_GROUPS; ++i) {
+        //DEBUG_COLOR(LIGHT_GREEN,"src[%d] = 0x%8x",j,src[j]);
+
+		groups[i] = (unsigned int)src[j++] << 16;
+
+        //DEBUG_COLOR(LIGHT_GREEN,"src[%d] = 0x%8x",j,src[j]);
+
+		groups[i] |= (unsigned int)src[j++] << 8;
+
+        //DEBUG_COLOR(LIGHT_GREEN,"src[%d] = 0x%8x",j,src[j]);
+
+		groups[i] |= src[j++];
+
+        //DEBUG_COLOR(LIGHT_GREEN,"src[%d] = 0x%08x",i,groups[i]);
+        //print_int_type_bin(groups[i]);
+	}
+
+    /* Convert prepared groups into 64 dscp */
+	k = 0;
+	for (i = 0; i < DSCP_CONVERSION_GROUPS; ++i) {
+		for (j = k + 7; j >= k; --j) {
+			mapping[j] = groups[i] & 0x7;
+			groups[i] >>= 3;
+		}
+		k += 8;
+	}
+
+    //print dscpToPbitMapping table
+    SET_COLOR(LIGHT_GREEN);
+    printf("%20s:%4d|\n",__FILE__,__LINE__);
+    for(i = 0;i<DSCP_MAX;i+=8){
+        printf("\t\t\t   map[%02d]:%d  map[%02d]:%d  map[%02d]:%d  map[%02d]:%d  map[%02d]:%d  map[%02d]:%d  map[%02d]:%d  map[%02d]:%d\n"
+            ,i,mapping[i],i+1,mapping[i+1]
+            ,i+2,mapping[i+2],i+3,mapping[i+3]
+            ,i+4,mapping[i+4],i+5,mapping[i+5]
+            ,i+6,mapping[i+6],i+7,mapping[i+7]);
+    }
+    SET_COLOR(NONECOLOR);
+
+}
 void parser_received_frame_VLAN_tagging_operation_table(unsigned char *receivedFrameVLANTaggingOperationTable,int size)
 {
 #if 0

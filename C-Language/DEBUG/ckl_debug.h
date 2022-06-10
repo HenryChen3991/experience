@@ -24,11 +24,11 @@
 #define DBGLEVEL_MSG_ERROR 1
 #define DBGLEVEL_MSG_NOTICE 1
 #if DEBUG_FLAG
-#define DEBUG(msg,arg...) printf("%20s:%4d " msg"\n",__FILE__,__LINE__,##arg)
-#define PRINT_FUNC(msg,arg...) printf("%20s:%4d Enter %s" msg"\n",__FILE__,__LINE__,__FUNCTION__,##arg)
-#define DEBUG_COLOR(color,msg,arg...) printf("%s%20s:%4d " msg"%s\n",color,__FILE__,__LINE__,##arg,NONECOLOR)
+#define DEBUG(msg,arg...) printf("%20s:%4d| " msg"\n",__FILE__,__LINE__,##arg)
+#define PRINT_FUNC(msg,arg...) printf("%20s:%4d| Enter %s" msg"\n",__FILE__,__LINE__,__FUNCTION__,##arg)
+#define DEBUG_COLOR(color,msg,arg...) printf("%s%20s:%4d| " msg"%s\n",color,__FILE__,__LINE__,##arg,NONECOLOR)
 //no new line
-#define NW_DEBUG_COLOR(color,msg,arg...) printf("%s%20s:%4d " msg"%s",color,__FILE__,__LINE__,##arg,NONECOLOR)
+#define NW_DEBUG_COLOR(color,msg,arg...) printf("%s%20s:%4d| " msg"%s",color,__FILE__,__LINE__,##arg,NONECOLOR)
 //no info
 #define NI_DEBUG_COLOR(color,msg,arg...) printf("%s"msg"%s",color,##arg,NONECOLOR)
 
@@ -36,13 +36,13 @@
 
 #define ERROR(msg,arg...) { \
     if (DBGLEVEL_MSG_ERROR) { \
-        printf("\n\033[1;31m%20s:%4d " msg"\033[0m\n",__FILE__,__LINE__,##arg); \
+        printf("\n\033[1;31m%20s:%4d| " msg"\033[0m\n",__FILE__,__LINE__,##arg); \
     } \
 }
 
 #define NOTICE(msg,arg...) { \
     if (DBGLEVEL_MSG_NOTICE) { \
-        printf("\033[1;34m%20s:%4d " msg"\033[0m\n",__FILE__,__LINE__,##arg); \
+        printf("\033[1;34m%20s:%4d| " msg"\033[0m\n",__FILE__,__LINE__,##arg); \
     } \
 }
 

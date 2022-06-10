@@ -89,44 +89,36 @@ int cmsUtl_strcmp(const char *s1, const char *s2)
 
 void print_short_type_bin(int n)
 {
-    int l = sizeof(short)*8;//總位數。
-    int i;
+    int c = 0, k = 0;
     printf("%s",LIGHT_CYAN);
-    if(i == 0)
+    for (c = 15; c >= 0; c--)
     {
-         printf("0");
-         return;
-     }
-    for(i = l-1; i >= 0; i --)//略去高位0.
-    {
-        printf("0");
-        if(n&(1<<i)) break;
+        k = n >> c;
+
+        if (k & 1)
+          printf("1");
+        else
+          printf("0");
     }
- 
-    for(;i>=0; i --)
-        printf("%d", (n&(1<<i)) != 0);
-    printf("%s\n",NONECOLOR);
+    printf(" --- %s\n",NONECOLOR);
 }
 
 void print_int_type_bin(int n)
 {
     int l = sizeof(int)*8;//總位數。
-    int i;
+    int c = 0, k = 0;
     printf("%s",LIGHT_CYAN);
-    if(i == 0)
+    for (c = 31; c >= 0; c--)
     {
-         printf("0");
-         return;
-     }
-    for(i = l-1; i >= 0; i --)//略去高位0.
-    {
-        printf("0");
-        if(n&(1<<i)) break;
+        k = n >> c;
+
+        if (k & 1)
+          printf("1");
+        else
+          printf("0");
     }
- 
-    for(;i>=0; i --)
-        printf("%d", (n&(1<<i)) != 0);
-    printf("%s\n",NONECOLOR);
+
+    printf(" --- %s\n",NONECOLOR);
 }
 
 char *cmsUtl_strncpy(char *dest, const char *src, int dlen)

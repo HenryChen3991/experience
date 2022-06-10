@@ -48,7 +48,7 @@ void dbg_omci_packet_format(omci_t *omci)
     DEBUG("OMCI DEVICE ID : %02x",omci->deviceId);
     DEBUG("OMCI ME ID     : %03d",htons(omci->meid));
     DEBUG("OMCI INSTANCE  : %0d",htons(omci->instance));
-    printf("%20s:%4d " "OMCI CONTECT   : ",__FILE__,__LINE__);
+    printf("%20s:%4d| " "OMCI CONTECT   : ",__FILE__,__LINE__);
     for(i=0;i<OMCI_MSG_CONTENT_LEN;i++){
         printf("%02x",omci->msgContect[i]);
     }
@@ -78,7 +78,7 @@ void print_ocmi_data_and_hex(char *color,const unsigned char *name,const unsigne
 {
     int i = 0;
     //printf("%s%20s:%4d Attr[%03d] %s : %s (",color,__FILE__,__LINE__,index,name,str);
-    printf("%s%20s:%4d Attr[%03d] %s : (",color,__FILE__,__LINE__,index,name);
+    printf("%s%20s:%4d| Attr[%03d] %s : (",color,__FILE__,__LINE__,index,name);
     for (i=0; i<size; i++)
     {
        printf("%02x",str[i]);

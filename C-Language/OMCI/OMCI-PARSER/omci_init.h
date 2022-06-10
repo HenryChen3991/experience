@@ -75,6 +75,8 @@ void dbg_module_info(omci_me_modules_t *module);
 typedef union VLANTaggingOperationTableMapping
 {
     unsigned int word[4];
+//#if (IFXOS_BYTE_ORDER == IFXOS_BIG_ENDIAN)
+//#else
     struct{
         unsigned int word1Padding :12;
         unsigned int filterOuterTpidde :3;
@@ -98,6 +100,7 @@ typedef union VLANTaggingOperationTableMapping
         unsigned int treatmentInnerPrio :4;
         unsigned int word4Padding :12;
     };
+//#endif //IFXOS_BIG_ENDIAN
 } VLANTaggingOperationTableMapping_t;
 
 /**
@@ -127,7 +130,8 @@ typedef struct omci_attr_handler
     unsigned char name[BUFLEN_128];
     unsigned int  size;
     void (*handler)(unsigned char *content,unsigned char *attr_name,unsigned int size,int index);
-} omci_attr_handler_t;
+
+} omci_attr_handler_t;
 
 #define OMCI_PACKET_MT_MAX (32)
 
