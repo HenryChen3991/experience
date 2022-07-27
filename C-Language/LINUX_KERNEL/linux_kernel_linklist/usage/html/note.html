@@ -1,0 +1,2636 @@
+<!-- © -->
+
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="css_body">
+
+<div class="css_div_form_title_large">速查表</div>
+<div class="css_div_form_body_large">
+  <br>
+
+  <table class="css_table_solid">
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_LIST_HEAD">LIST_HEAD</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 宣告一個變數做為鍊結串列頭並初始化.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_INIT_LIST_HEAD">INIT_LIST_HEAD</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 初始化鍊結串列頭.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_add">list_add</a></td>
+      <td class="css_td_solid_normal">
+        插入串列節點到鍊結串列的頭端.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_add_tail">list_add_tail</a></td>
+      <td class="css_td_solid_normal">
+        插入串列節點到鍊結串列的尾端.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook___list_del_entry">__list_del_entry</a></td>
+      <td class="css_td_solid_normal">
+        從鍊結串列上刪除串列節點.<br>
+        <font class="css_font_r1">從 kernel 2.6.38 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_del">list_del</a></td>
+      <td class="css_td_solid_normal">
+        從鍊結串列上刪除串列節點, 並設定串列節點的 next 和 prev 為 LIST_POISON1 和 LIST_POISON2.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_del_init">list_del_init</a></td>
+      <td class="css_td_solid_normal">
+        從鍊結串列上刪除串列節點, 並初始化串列節點.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_empty">list_empty</a></td>
+      <td class="css_td_solid_normal">
+        判斷鍊結串列上是否沒有任何串列節點.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_empty_careful">list_empty_careful</a></td>
+      <td class="css_td_solid_normal">
+        判斷鍊結串列上是否沒有任何串列節點.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_is_singular">list_is_singular</a></td>
+      <td class="css_td_solid_normal">
+        判斷鍊結串列上串列節點數目是否是一.<br>
+        <font class="css_font_r1">從 kernel 2.6.26 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_is_last">list_is_last</a></td>
+      <td class="css_td_solid_normal">
+        判斷串列節點是否是在鍊結串列的最尾端.<br>
+        <font class="css_font_r1">從 kernel 2.6.18 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_rotate_left">list_rotate_left</a></td>
+      <td class="css_td_solid_normal">
+        將鍊結串列做左旋處理, 也就是把第一個串列節點移動到最後一個.<br>
+        <font class="css_font_r1">從 kernel 2.6.34 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_replace">list_replace</a></td>
+      <td class="css_td_solid_normal">
+        將鍊結串列上的串列節點替換為新的串列節點, 但是不初始化被替換的串列節點.<br>
+        <font class="css_font_r1">從 kernel 2.6.18 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_replace_init">list_replace_init</a></td>
+      <td class="css_td_solid_normal">
+        將鍊結串列上的串列節點替換為新的串列節點, 並初始化被替換的串列節點.<br>
+        <font class="css_font_r1">從 kernel 2.6.18 開始之後才有</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_move">list_move</a></td>
+      <td class="css_td_solid_normal">
+        將串列節點從原本的鍊結串列上移動到另一個鍊結串列的頭端.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_move_tail">list_move_tail</a></td>
+      <td class="css_td_solid_normal">
+        將串列節點從原本的鍊結串列上移動到另一個鍊結串列的尾端.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_cut_position">list_cut_position</a></td>
+      <td class="css_td_solid_normal">
+        分割鍊結串列, 將原本的鍊結串列分成二半.<br>
+        <font class="css_font_r1">從 kernel 2.6.27 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_splice">list_splice</a></td>
+      <td class="css_td_solid_normal">
+        合併鍊結串列, 將鍊結串列一的內容合併到鍊結串列二的頭端.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_splice_init">list_splice_init</a></td>
+      <td class="css_td_solid_normal">
+        合併鍊結串列, 將鍊結串列一的內容合併到鍊結串列二的頭端, 並初始化鍊結串列一.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_splice_tail">list_splice_tail</a></td>
+      <td class="css_td_solid_normal">
+        合併鍊結串列, 將鍊結串列一的內容合併到鍊結串列二的尾端.<br>
+        <font class="css_font_r1">從 kernel 2.6.27 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_splice_tail_init">list_splice_tail_init</a></td>
+      <td class="css_td_solid_normal">
+        合併鍊結串列, 將鍊結串列一的內容合併到鍊結串列二的尾端, 並初始化鍊結串列一.<br>
+        <font class="css_font_r1">從 kernel 2.6.27 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_entry">list_entry</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 透過結構成員的位址獲得結構主體的位址.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_first_entry">list_first_entry</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 取得鍊結串列上第一個節點的位址.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_first_entry_or_null">list_first_entry_or_null</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 取得鍊結串列上第一個節點的位址, 如果不存在任何節點則回傳 NULL.<br>
+        <font class="css_font_r1">從 kernel 3.10 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_last_entry">list_last_entry</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 取得鍊結串列上最後一個節點的位址.<br>
+        <font class="css_font_r1">從 kernel 3.13 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_next_entry">list_next_entry</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 取得某個節點的後一個節點的位址.<br>
+        <font class="css_font_r1">從 kernel 3.13 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_prev_entry">list_prev_entry</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 取得某個節點的前一個節點的位址.<br>
+        <font class="css_font_r1">從 kernel 3.13 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each">list_for_each</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 走訪鍊結串列上的所有串列節點 (不可在走訪期間刪除節點).<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_safe">list_for_each_safe</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 走訪鍊結串列上的所有串列節點 (可以在走訪期間刪除節點).<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_prev">list_for_each_prev</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 反向走訪鍊結串列上的所有串列節點 (不可在走訪期間刪除節點).<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_prev_safe">list_for_each_prev_safe</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 反向走訪鍊結串列上的所有串列節點 (可以在走訪期間刪除節點).<br>
+        <font class="css_font_r1">從 kernel 2.6.24 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry">list_for_each_entry</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 走訪鍊結串列上的所有節點 (不可在走訪期間刪除節點).<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_safe">list_for_each_entry_safe</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 走訪鍊結串列上的所有節點 (可以在走訪期間刪除節點).<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_reverse">list_for_each_entry_reverse</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 反向走訪鍊結串列上的所有節點 (不可在走訪期間刪除節點).<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_safe_reverse">list_for_each_entry_safe_reverse</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 反向走訪鍊結串列上的所有節點 (可以在走訪期間刪除節點).<br>
+        <font class="css_font_r1">從 kernel 2.6.16 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_prepare_entry">list_prepare_entry</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 檢查節點是否為 NULL, 是的話回傳鍊結串列的位址, 否的話回傳節點原本的位址.<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_from">list_for_each_entry_from</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 從某個節點開始走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+        <font class="css_font_r1">從 kernel 2.6.17 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_safe_from">list_for_each_entry_safe_from</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 從某個節點開始走訪鍊結串列上的節點 (可以在走訪期間刪除節點).<br>
+        <font class="css_font_r1">從 kernel 2.6.17 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_from_reverse">list_for_each_entry_from_reverse</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 從某個節點開始反向走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+        <font class="css_font_r1">從 kernel 4.11 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_continue">list_for_each_entry_continue</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 從某個節點的後一個節點開始走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_safe_continue">list_for_each_entry_safe_continue</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 從某個節點的後一個節點開始走訪鍊結串列上的節點 (可以在走訪期間刪除節點).<br>
+        <font class="css_font_r1">從 kernel 2.6.14 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_for_each_entry_continue_reverse">list_for_each_entry_continue_reverse</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 從某個節點的前一個節點開始反向走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+        <font class="css_font_r1">從 kernel 2.6.24 開始之後才有.</font><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="css_td_solid_nowrap"><a href="#hook_list_safe_reset_next">list_safe_reset_next</a></td>
+      <td class="css_td_solid_normal">
+        巨集, 取得某個節點的下一個節點的位址.<br>
+        <font class="css_font_r1">從 kernel 2.6.35 開始之後才有.</font><br>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+</div>
+<br>
+
+<div class="css_div_form_title_large">說明</div>
+<div class="css_div_form_body_large">
+  <br>
+
+  需要的標頭檔 :<br>
+  <div class="css_div_attent">
+    <font class="css_font_b1">#include &lt;linux/list.h&gt;</font><br>
+  </div>
+  <br><br>
+
+  紀錄鍊結串列的結構, 須要在自定的資料結構中宣告一個, 以及宣告一個變數做為鍊結串列的頭 :<br>
+  <div class="css_div_attent">
+    <font class="css_font_g1">struct list_head</font><br>
+  </div>
+  <br><br>
+
+  在自定的資料結構中宣告一個鍊結串列節點 :<br>
+<pre class="css_pre_code">
+// 範例, 定義一個記錄每個產品的名稱和價格的結構.
+struct product_t
+{
+    // 串列節點.
+    struct list_head lnode;
+    // 產品名稱.
+    char name[16];
+    // 產品價格.
+    unsigned int price;
+};
+</pre>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_LIST_HEAD"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">LIST_HEAD</font><br>
+    巨集, 宣告一個變數做為鍊結串列頭並初始化.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">name</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          變數的名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 宣告一個紅黑樹樹根並初始化.
+struct rb_root product_tree = RB_ROOT;
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_INIT_LIST_HEAD"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">INIT_LIST_HEAD</font><br>
+    巨集, 初始化鍊結串列頭.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要初始化的鍊結串列頭.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 範例, 宣告一個紀錄產品資料的鍊結串列頭.
+struct list_head product_list;
+
+// 在函式中初始化鍊結串列頭, 例如在核心模組的 init() 函式.
+static int __init main_init(
+    void)
+{
+    // 初始化鍊結串列頭.
+    INIT_HLIST_HEAD(&product_list);
+
+    return 0;
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_add"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_add</font><br>
+    插入串列節點到鍊結串列的頭端.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">new</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要插入的串列節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          鍊結串列頭.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *new_product;
+
+    // 01. 使用 kmalloc() 取得空間.
+    // 02. 填入產品資料.
+    // 03. 確認鍊結串列上沒有相同產品名稱的資料存在.
+    new_product = ...
+
+    // 插入.
+    list_add(&(new_product->lnode), &product_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_add_tail"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_add_tail</font><br>
+    插入串列節點到鍊結串列的尾端.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">new</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要插入的串列節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          鍊結串列頭.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *new_product;
+
+    // 01. 使用 kmalloc() 取得空間.
+    // 02. 填入產品資料.
+    // 03. 確認鍊結串列上沒有相同產品名稱的資料存在.
+    new_product = ...
+
+    // 插入.
+    list_add_tail(&(new_product->lnode), &product_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook___list_del_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">__list_del_entry</font><br>
+    從鍊結串列上刪除串列節點.<br>
+    <font class="css_font_r1">從 kernel 2.6.38 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">entry</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要刪除的串列節點.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到要刪除的節點.
+    target_product = ...
+
+    // 刪除.
+    __list_del_entry(&(target_product->lnode));
+    kfree(target_product);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_del"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_del</font><br>
+    從鍊結串列上刪除串列節點, 並設定串列節點的 next 和 prev 為 LIST_POISON1 和 LIST_POISON2.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">entry</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要刪除的串列節點.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到要刪除的節點.
+    target_product = ...
+
+    // 刪除.
+    list_del(&(target_product->lnode));
+    kfree(target_product);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_del_init"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_del_init</font><br>
+    從鍊結串列上刪除串列節點, 並初始化串列節點.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">entry</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要刪除的串列節點.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到要刪除的節點.
+    target_product = ...
+
+    // 刪除.
+    list_del_init(&(target_product->lnode));
+    kfree(target_product);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_empty"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">int</font><br>
+    <font class="css_font_b2">list_empty</font><br>
+    判斷鍊結串列上是否沒有任何串列節點.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">const struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要檢查的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">回傳</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">0</font></td>
+        <td class="css_td_solid_normal">否, 有串列節點.</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">1</font></td>
+        <td class="css_td_solid_normal">是, 無串列節點.</td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    int ret;
+
+    // 檢查.
+    ret = list_empty(&product_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_empty_careful"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">int</font><br>
+    <font class="css_font_b2">list_empty_careful</font><br>
+    判斷鍊結串列上是否沒有任何串列節點,
+    如果有多個行程同時操作同個鍊結串列而且其他行程只會做刪除節點的動作,
+    則可以在不鎖定鍊結串列的情況下使用此函式檢查.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">const struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要檢查的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">回傳</font></td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">0</font></td>
+        <td class="css_td_solid_normal">否, 有串列節點.</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">1</font></td>
+        <td class="css_td_solid_normal">是, 無串列節點.</td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    int ret;
+
+    // 檢查.
+    ret = list_empty_careful(&product_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_is_singular"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">int</font><br>
+    <font class="css_font_b2">list_is_singular</font><br>
+    判斷鍊結串列上串列節點數目是否是一.<br>
+    <font class="css_font_r1">從 kernel 2.6.26 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">const struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要檢查的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">回傳</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">0</font></td>
+        <td class="css_td_solid_normal">否, 串列節點數目非一.</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">1</font></td>
+        <td class="css_td_solid_normal">是, 串列節點數目是一.</td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    int ret;
+
+    // 檢查.
+    ret = list_is_singular(&product_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_is_last"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">int</font><br>
+    <font class="css_font_b2">list_is_last</font><br>
+    判斷串列節點是否是在鍊結串列的最尾端.<br>
+    <font class="css_font_r1">從 kernel 2.6.18 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">const struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要檢查的串列節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">const struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          串列節點所在的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">回傳</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">0</font></td>
+        <td class="css_td_solid_normal">否, 不在最尾端.</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap"><font class="css_font_g1">1</font></td>
+        <td class="css_td_solid_normal">是, 是在最尾端.</td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+    int ret;
+
+    // 01. 找到要檢查的節點.
+    target_product = ...
+
+    // 檢查.
+    ret = list_is_last(&(target_product->lnode), &product_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_rotate_left"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_rotate_left</font><br>
+    將鍊結串列做左旋處理, 也就是把第一個串列節點移動到最後一個.<br>
+    <font class="css_font_r1">從 kernel 2.6.34 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要處理的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    // 左旋.
+    list_rotate_left(&product_list);
+
+    // 範例 :
+    // product_list 原本是 : 15 48 62.
+    // 處理後 : 48 62 15.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_replace"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_replace</font><br>
+    將鍊結串列上的串列節點 (old) 替換為新的串列節點 (new), 但是不初始化串列節點 (old).<br>
+    <font class="css_font_r1">從 kernel 2.6.18 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">old</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要被替換的串列節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">new</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要換成哪個串列節點.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *old_product, *new_product;
+
+    // 01. 找到要被替換的節點.
+    old_product = ...
+    // 01. 使用 kmalloc() 取得空間.
+    // 02. 填入產品資料.
+    // 03. 確認鍊結串列上沒有相同產品名稱的資料存在.
+    new_product = ...
+
+    // 替換.
+    // 需要注意 old_product 的 next 和 prev 不會被初始化.
+    list_replace(&(old_product->lnode), &(new_product->lnode));
+    kfree(old_product);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_replace_init"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_replace_init</font><br>
+    將鍊結串列上的串列節點 (old) 替換為新的串列節點 (new), 並初始化串列節點 (old).<br>
+    <font class="css_font_r1">從 kernel 2.6.18 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">old</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要被替換的串列節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">new</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要換成哪個串列節點.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *old_product, *new_product;
+
+    // 01. 找到要被替換的節點.
+    old_product = ...
+    // 01. 使用 kmalloc() 取得空間.
+    // 02. 填入產品資料.
+    // 03. 確認鍊結串列上沒有相同產品名稱的資料存在.
+    new_product = ...
+
+    // 替換.
+    list_replace_init(&(old_product->lnode), &(new_product->lnode));
+    kfree(old_product);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_move"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_move</font><br>
+    將串列節點從原本的鍊結串列上移動到另一個鍊結串列的頭端.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要移動的串列節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要移動到哪個鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 新的鍊結串列.
+struct product_t new_list;
+
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到要移動的節點.
+    target_product = ...
+
+    // 移動.
+    list_move(&(target_product->lnode), &new_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_move_tail"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_move_tail</font><br>
+    將串列節點從原本的鍊結串列上移動到另一個鍊結串列的尾端.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要移動的串列節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要移動到哪個鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 新的鍊結串列.
+struct product_t new_list;
+
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到要移動的節點.
+    target_product = ...
+
+    // 移動.
+    list_move_tail(&(target_product->lnode), &new_list);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_cut_position"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_cut_position</font><br>
+    分割鍊結串列, 將原本的鍊結串列 (head) 從串列節點 (entry) 分成二半,
+    原本的鍊結串列的前半部分 (包含 entry) 給 head,
+    原本的鍊結串列的後半部分 (entry 之後) 給 list.<br>
+    <font class="css_font_r1">從 kernel 2.6.27 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          新的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要被分割的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">entry</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          從哪個串列節點分割.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 新的鍊結串列.
+struct product_t new_list;
+
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到要分割的節點.
+    target_product = ...
+
+    // 分割.
+    list_cut_position(&new_list, &product_list, &(target_product->lnode));
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_splice"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_splice</font><br>
+    合併鍊結串列, 將鍊結串列 (list) 的內容合併到鍊結串列 (head) 的頭端, 但是不初始化鍊結串列 (list).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">const struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要被合併的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          合併到哪個鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 要被合併的鍊結串列.
+struct product_t other_list;
+
+void ...(
+    void)
+{
+    // 合併.
+    list_splice(&other_list, &product_list);
+
+    // 範例 :
+    // other_list 的節點有 : 50 21.
+    // product_list 的節點有 : 17 83.
+    // 合併後 :
+    // product_list 的節點有 : 50 21 17 83.
+    // 因為 other_list 不會被初始化,
+    // other_list 的節點有 : 50 21 17 83.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_splice_init"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_splice_init</font><br>
+    合併鍊結串列, 將鍊結串列 (list) 的內容合併到鍊結串列 (head) 的頭端, 並初始化鍊結串列 (list).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要被合併的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          合併到哪個鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 要被合併的鍊結串列.
+struct product_t other_list;
+
+void ...(
+    void)
+{
+    // 合併.
+    list_splice_init(&other_list, &product_list);
+
+    // 範例 :
+    // other_list 的節點有 : 50 21.
+    // product_list 的節點有 : 17 83.
+    // 合併後 :
+    // product_list 的節點有 : 50 21 17 83.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_splice_tail"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_splice_tail</font><br>
+    合併鍊結串列, 將鍊結串列 (list) 的內容合併到鍊結串列 (head) 的尾端, 但是不初始化鍊結串列 (list).<br>
+    <font class="css_font_r1">從 kernel 2.6.27 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要被合併的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          合併到哪個鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 要被合併的鍊結串列.
+struct product_t other_list;
+
+void ...(
+    void)
+{
+    // 合併.
+    list_splice_tail(&other_list, &product_list);
+
+    // 範例 :
+    // other_list 的節點有 : 50 21.
+    // product_list 的節點有 : 17 83.
+    // 合併後 :
+    // product_list 的節點有 : 17 83 50 21.
+    // 因為 other_list 不會被初始化,
+    // other_list 的節點有 : 50 21.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_splice_tail_init"></div>
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">list_splice_tail_init</font><br>
+    合併鍊結串列, 將鍊結串列 (list) 的內容合併到鍊結串列 (head) 的尾端, 並初始化鍊結串列 (list).<br>
+    <font class="css_font_r1">從 kernel 2.6.27 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">list</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要被合併的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          合併到哪個鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+// 要被合併的鍊結串列.
+struct product_t other_list;
+
+void ...(
+    void)
+{
+    // 合併.
+    list_splice_tail_init(&other_list, &product_list);
+
+    // 範例 :
+    // other_list 的節點有 : 50 21.
+    // product_list 的節點有 : 17 83.
+    // 合併後 :
+    // product_list 的節點有 : 17 83 50 21.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_entry</font><br>
+    巨集, 透過結構成員的位址獲得結構主體的位址.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">ptr</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          結構成員的位址.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">type</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          結構的類型.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          結構成員的名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct list_head *target_lnode;
+    struct product_t *target_product;
+
+    // 01. 指向某個串列節點.
+    target_lnode = ...
+
+    // 取得結構主體位址.
+    target_product = list_entry(target_lnode, struct product_t, lnode);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_first_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_first_entry</font><br>
+    巨集, 取得鍊結串列上第一個節點的位址.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">ptr</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">type</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構類型.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 取得第一個節點的位址.
+    target_product = list_first_entry(&product_list, struct product_t, lnode);
+
+    // 注意, 如果鍊結串列上沒有任何節點, target_product 會指向 product_list 而不是 NULL,
+    // 如果要檢查實際上是否有節點, 取得位址後要使用 (target_product == &product_list) 做檢查,
+    // 判斷式成立表示沒有節點, 不成立表示是第一個節點.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_first_entry_or_null"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_first_entry_or_null</font><br>
+    巨集, 取得鍊結串列上第一個節點的位址, 如果不存在任何節點則回傳 NULL.<br>
+    <font class="css_font_r1">從 kernel 3.10 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">ptr</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">type</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構類型.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 取得第一個節點的位址.
+    target_product = list_first_entry_or_null(&product_list, struct product_t, lnode);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_last_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_last_entry</font><br>
+    巨集, 取得鍊結串列上最後一個節點的位址.<br>
+    <font class="css_font_r1">從 kernel 3.13 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">ptr</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">type</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構類型.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 取得最後一個節點的位址.
+    target_product = list_last_entry(&product_list, struct product_t, lnode);
+
+    // 注意, 如果鍊結串列上沒有任何節點, target_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_next_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_next_entry</font><br>
+    巨集, 取得某個節點的後一個節點的位址.<br>
+    <font class="css_font_r1">從 kernel 3.13 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到目標節點.
+    target_product = ...
+
+    // 取得後一個節點節點的位址.
+    target_product = list_next_entry(target_product, lnode);
+
+    // 注意, 如果目標節點是鍊結串列上的最後一個節點,
+    // target_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_prev_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_prev_entry</font><br>
+    巨集, 取得某個節點的前一個節點的位址.<br>
+    <font class="css_font_r1">從 kernel 3.13 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *target_product;
+
+    // 01. 找到目標節點.
+    target_product = ...
+
+    // 取得前一個節點節點的位址.
+    target_product = list_prev_entry(target_product, lnode);
+
+    // 注意, 如果目標節點是鍊結串列上的第一個節點,
+    // target_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each</font><br>
+    巨集, 走訪鍊結串列上的所有串列節點 (不可在走訪期間刪除節點).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前串列節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct list_head *each_lnode;
+    struct product_t *each_product;
+
+    // 走訪.
+    list_for_each(each_lnode, &product_list)
+    {
+        // each_lnode 會指向目前的串列節點.
+        each_product = list_entry(each_lnode, struct product_t, lnode);
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_lnode 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_safe"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_safe</font><br>
+    巨集, 走訪鍊結串列上的所有串列節點 (可以在走訪期間刪除節點).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前串列節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">n</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          暫存用的串列節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct list_head *each_lnode, *tmp_lnode;
+    struct product_t *each_product;
+
+    // 走訪.
+    list_for_each_safe(each_lnode, tmp_lnode, &product_list)
+    {
+        // each_lnode 會指向目前的串列節點.
+        each_product = list_entry(each_lnode, struct product_t, lnode);
+        ...
+        // 可以在走訪期間刪除節點.
+        list_del(each_lnode);
+        kfree(each_product);
+    }
+
+    // 注意, 走訪完畢後 each_lnode 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_prev"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_prev</font><br>
+    巨集, 反向走訪鍊結串列上的所有串列節點 (不可在走訪期間刪除節點).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前串列節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct list_head *each_lnode;
+    struct product_t *each_product;
+
+    // 走訪.
+    list_for_each_prev(each_lnode, &product_list)
+    {
+        // each_lnode 會指向目前的串列節點.
+        each_product = list_entry(each_lnode, struct product_t, lnode);
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_lnode 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_prev_safe"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_prev_safe</font><br>
+    巨集, 反向走訪鍊結串列上的所有串列節點 (可以在走訪期間刪除節點).<br>
+    <font class="css_font_r1">從 kernel 2.6.24 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前串列節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">n</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          暫存用的串列節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct list_head *each_lnode, *tmp_lnode;
+    struct product_t *each_product;
+
+    // 走訪.
+    list_for_each_prev_safe(each_lnode, tmp_lnode, &product_list)
+    {
+        // each_lnode 會指向目前的串列節點.
+        each_product = list_entry(each_lnode, struct product_t, lnode);
+        ...
+        // 可以在走訪期間刪除節點.
+        list_del(each_lnode);
+        kfree(each_product);
+    }
+
+    // 注意, 走訪完畢後 each_lnode 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry</font><br>
+    巨集, 走訪鍊結串列上的所有節點 (不可在走訪期間刪除節點).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product;
+
+    // 走訪.
+    list_for_each_entry(each_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_safe"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_safe</font><br>
+    巨集, 走訪鍊結串列上的所有節點 (可以在走訪期間刪除節點).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">n</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          暫存用的節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product, *tmp_product;
+
+    // 走訪.
+    list_for_each_entry_safe(each_product, tmp_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+        // 可以在走訪期間刪除節點.
+        list_del(&(each_lnode->lnode));
+        kfree(each_product);
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_reverse"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_reverse</font><br>
+    巨集, 反向走訪鍊結串列上的所有節點 (不可在走訪期間刪除節點).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product;
+
+    // 走訪.
+    list_for_each_entry_reverse(each_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_safe_reverse"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_safe_reverse</font><br>
+    巨集, 反向走訪鍊結串列上的所有節點 (可以在走訪期間刪除節點).<br>
+    <font class="css_font_r1">從 kernel 2.6.16 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">n</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          暫存用的節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要走訪的鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product, *tmp_product;
+
+    // 走訪.
+    list_for_each_entry_safe_reverse(each_product, tmp_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+        // 可以在走訪期間刪除節點.
+        list_del(&(each_lnode->lnode));
+        kfree(each_product);
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_prepare_entry"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_prepare_entry</font><br>
+    巨集, 檢查節點是否為 NULL, 是的話回傳鍊結串列 (head) 的位址, 否的話回傳節點 (pos) 原本的位址.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要檢查的節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product = NULL;
+
+    // 檢查.
+    // 如果 each_product 在檢查時維持 NULL,
+    // 則會回傳 product_list 的位址, 否則回傳 each_product 的位址 (也就是不修改).
+    each_product = list_prepare_entry(each_product, &product_list, lnode);
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_from"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_from</font><br>
+    巨集, 從某個節點開始走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+    <font class="css_font_r1">從 kernel 2.6.17 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          從此節點開始走訪, 紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product;
+
+    // 01. 找到目標節點.
+    each_product = ...
+
+    // 走訪.
+    list_for_each_entry_from(each_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_safe_from"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_safe_from</font><br>
+    巨集, 從某個節點開始走訪鍊結串列上的節點 (可以在走訪期間刪除節點).<br>
+    <font class="css_font_r1">從 kernel 2.6.17 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          從此節點開始走訪, 紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">n</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          暫存用的節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product, *tmp_product;
+
+    // 01. 找到目標節點.
+    each_product = ...
+
+    // 走訪.
+    list_for_each_entry_safe_from(each_product, tmp_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+        // 可以在走訪期間刪除節點.
+        list_del(&(each_lnode->lnode));
+        kfree(each_product);
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_from_reverse"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_from_reverse</font><br>
+    巨集, 從某個節點開始反向走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+    <font class="css_font_r1">從 kernel 4.11 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          從此節點開始走訪, 紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product;
+
+    // 01. 找到目標節點.
+    each_product = ...
+
+    // 走訪.
+    list_for_each_entry_from_reverse(each_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_continue"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_continue</font><br>
+    巨集, 從某個節點的後一個節點開始走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          從此節點的後一個節點開始走訪, 紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product;
+
+    // 01. 找到目標節點.
+    each_product = ...
+
+    // 走訪.
+    list_for_each_entry_continue(each_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_safe_continue"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_safe_continue</font><br>
+    巨集, 從某個節點的後一個節點開始走訪鍊結串列上的節點 (可以在走訪期間刪除節點).<br>
+    <font class="css_font_r1">從 kernel 2.6.14 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          從此節點的前一個節點開始走訪, 紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">n</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          暫存用的節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product, *tmp_product;
+
+    // 01. 找到目標節點.
+    each_product = ...
+
+    // 走訪.
+    list_for_each_entry_safe_continue(each_product, tmp_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+        // 可以在走訪期間刪除節點.
+        list_del(&(each_lnode->lnode));
+        kfree(each_product);
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_for_each_entry_continue_reverse"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_for_each_entry_continue_reverse</font><br>
+    巨集, 從某個節點的前一個節點開始反向走訪鍊結串列上的節點 (不可在走訪期間刪除節點).<br>
+    <font class="css_font_r1">從 kernel 2.6.24 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          從此節點的前一個節點開始走訪, 紀錄指向目前節點的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct list_head *</font><br>
+          <font class="css_font_g1">head</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標鍊結串列.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product;
+
+    // 01. 找到目標節點.
+    each_product = ...
+
+    // 走訪.
+    list_for_each_entry_continue_reverse(each_product, &product_list, lnode)
+    {
+        // each_product 會指向目前的節點.
+        ...
+    }
+
+    // 注意, 走訪完畢後 each_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_hook" id="hook_list_safe_reset_next"></div>
+  <div class="css_div_group">
+    <font class="css_font_b2">list_safe_reset_next</font><br>
+    巨集, 取得某個節點的下一個節點的位址.<br>
+    <font class="css_font_r1">從 kernel 2.6.35 開始之後才有.</font><br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">pos</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          目標節點.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct ???? *</font><br>
+          <font class="css_font_g1">n</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          紀錄下一個節點的位址的變數.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">member</font>
+        </td>
+        <td class="css_td_solid_normal">
+          節點的結構內紀錄串列節點資料的變數名稱.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    範例 :<br>
+<pre class="css_pre_code">
+void ...(
+    void)
+{
+    struct product_t *each_product, *tmp_product;
+
+    // 01. 找到目標節點.
+    each_product = ...
+
+    // 取得.
+    list_safe_reset_next(each_product, tmp_product, lnode);
+
+    // 注意, 如果 each_product 是鍊結串列上的最後一個節點,
+    // tmp_product 會指向 product_list 而不是 NULL.
+}
+</pre>
+  </div>
+  <br><br>
+
+</div>
+
+</body>
+
+</html>
