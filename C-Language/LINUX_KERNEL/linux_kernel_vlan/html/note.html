@@ -1,0 +1,204 @@
+<!-- © -->
+
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="css_body">
+
+<div class="css_div_form_title_large">Linux kernel VLAN (3.0 later)</div>
+<div class="css_div_form_body_large">
+  <br>
+
+  Linux kernel 3.0 之後的核心對於封包的 VLAN 處理不同於 2.6, 需要注意的部分.<br>
+  <br><br>
+
+  檔案 <font class="css_font_b1">linux/include/linux/skbuff.h</font><br>
+<pre class="css_pre_code">
+struct sk_buff {
+    ...
+
+    // 新增的結構成員, 記錄 VLAN 的協定編號 (ETH_P_8021Q 或 ETH_P_8021AD).
+    __be16 vlan_proto;
+
+    // 新增的結構成員, 記錄 VLAN 的資料 (VLAN ID).
+    __u16 vlan_tci;
+
+    ...
+};
+</pre>
+  <br><br><br>
+
+  檔案 <font class="css_font_b1">linux/net/core/dev.c</font><br>
+<pre class="css_pre_code">
+static int __netif_receive_skb_core(struct sk_buff *skb, bool pfmemalloc)
+{
+    ...
+
+    // linux kernel 3.0 之後, 封包的 VLAN 標頭在函數開頭就會被移除 (2.6 是在函式的後半部處理).
+    if (skb->protocol == cpu_to_be16(ETH_P_8021Q) ||
+        skb->protocol == cpu_to_be16(ETH_P_8021AD)) {
+            // VLAN 標頭的資料會被放到 skb->vlan_proto 和 skb->vlan_tci,
+            // skb->vlan_proto 會紀錄 VLAN 的協定編號 (ETH_P_8021Q 或 ETH_P_8021AD).
+            // skb->vlan_tci 會紀錄 VLAN 的 VLAN ID.
+            // skb->protocol 記錄的協定編號會被替換成 VLAN 標頭中記錄的下一層協定的編號.
+            // 例如 :
+            // 封包中 VLAN 標頭記錄的協定編號是 ETH_P_IP,
+            // 經過 skb_vlan_untag() 處理後, skb->protocol 內容會從 ETH_P_8021Q 改為 ETH_P_IP.
+            skb = skb_vlan_untag(skb);
+            if (unlikely(!skb))
+                goto out;
+    }
+
+    ...
+
+    // 傳送封包給註冊 raw socket 的程式.
+    // 在 linux kernel 3.0 之後因為封包的 VLAN 標頭在前面的處理就會被拔掉,
+    // 所以 raw socket 程式收到的封包不會帶有 VLAN 標頭.
+    // 如果 raw socket 程式需要封包的 VLAN 資料的話, 解決辦法 :
+    // 方案一 :
+    // 修改核心程式, 將這段程式移動到處理封包的 VLAN 標頭之前.
+    // 方案二 :
+    // 不修改核心程式, 使用 recvmsg() 接收封包和輔助資料 (ancillary data, PACKET_AUXDATA),
+    // 輔助資料會紀錄 VLAN 資料.
+    list_for_each_entry_rcu(ptype, &ptype_all, list) {
+        if (pt_prev)
+            ret = deliver_skb(skb, pt_prev, orig_dev);
+    }
+
+    ...
+
+    // 如果有使用 bridge 處理, 這邊會呼叫 bridge 函式.
+    rx_handler = rcu_dereference(skb->dev->rx_handler);
+    ...
+
+    // 這邊會檢查 skb->vlan_tci 是否有值, 有的話會將封包類型設為 PACKET_OTHERHOST,
+    // PACKET_OTHERHOST 的封包在進入三層協定處理時會被丟棄.
+    // 如果有使用 nf_register_hook() 註冊處理函式在 NF_BR_LOCAL_IN 的話需要注意,
+    // 如果要讓封包允許進入本地除了要回傳 NF_ACCEPT, 還要將 skb->vlan_tci 設為 0.
+    if (unlikely(skb_vlan_tag_present(skb))) {
+        if (skb_vlan_tag_get_id(skb))
+            skb->pkt_type = PACKET_OTHERHOST;
+        /* Note: we might in the future use prio bits
+         * and set skb->priority like in vlan_do_receive()
+         * For the time being, just ignore Priority Code Point
+         */
+        skb->vlan_tci = 0;
+    }
+
+    ...
+}
+</pre>
+  <br><br><br>
+
+  檔案 <font class="css_font_b1">linux/net/core/dev.c</font><br>
+<pre class="css_pre_code">
+int dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev,
+                        struct netdev_queue *txq)
+{
+    ...
+
+    // 如果有使用 nf_register_hook() 註冊處理函式, 並且在處理函式中需要對傳送出去的封包加上 VLAN 標頭,
+    // 只需要對 skb->vlan_tci 設定 VLAN ID, 實際將 VLAN 塞入封包的處理會在這邊處理.
+    if (vlan_tx_tag_present(skb) &&
+        !(features & NETIF_F_HW_VLAN_TX)) {
+            skb = __vlan_put_tag(skb, vlan_tx_tag_get(skb));
+            if (unlikely(!skb))
+                goto out;
+
+            skb->vlan_tci = 0;
+    }
+
+    ...
+}
+</pre>
+  <br><br><br>
+
+  在 nf_register_hook() 註冊的處理函式處理 VLAN 需要的標頭檔 :<br>
+  <div class="css_div_attent">
+    <font class="css_font_b1">#include &lt;linux/if_vlan.h&gt;</font><br>
+  </div>
+  <br><br>
+
+  <font class="css_font_b1">if_vlan.h</font> 提供的一些操作 :<br>
+  <br>
+
+  <div class="css_div_group">
+    <font class="css_font_b2">skb_vlan_tag_get_id</font><br>
+    巨集, 取得 skb 內 vlan_tci 記錄的 VLAN ID.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_g1">__skb</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要處理的 skb 資料.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    例如 :<br>
+<pre class="css_pre_code">
+__u16 vld;
+vid = skb_vlan_tag_get_id(skb);
+</pre>
+  </div>
+  <br><br>
+
+  <div class="css_div_group">
+    <font class="css_font_r2">void</font><br>
+    <font class="css_font_b2">__vlan_hwaccel_put_tag</font><br>
+    設定 skb 的 vlan_proto 和 vlan_tci.<br>
+    <br>
+    <table class="css_table_solid">
+      <tr>
+        <td class="css_td_solid_center" colspan="2">參數</td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">struct sk_buff *</font><br>
+          <font class="css_font_g1">skb</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          要處理的 skb 資料.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">__be16</font><br>
+          <font class="css_font_g1">vlan_proto</font><br>
+        </td>
+        <td class="css_td_solid_normal">
+          指定的 VLAN 協定.<br>
+        </td>
+      </tr>
+      <tr>
+        <td class="css_td_solid_nowrap">
+          <font class="css_font_r1">u16</font><br>
+          <font class="css_font_g1">vlan_tci</font>
+        </td>
+        <td class="css_td_solid_normal">
+          指定的 VLAN ID.<br>
+        </td>
+      </tr>
+    </table>
+    <br>
+    例如 :<br>
+<pre class="css_pre_code">
+__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), 123);
+</pre>
+  </div>
+  <br><br>
+
+</div>
+
+</body>
+
+</html>
