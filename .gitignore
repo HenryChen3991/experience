@@ -15,3 +15,7 @@ C-Language/OMCI/OMCI-PARSER/omci.o
 C-Language/OMCI/OMCI-PARSER/omciparser.o
 C-Language/OMCI/OMCI-PARSER/omciparser
 C-Language/NETWORK/packet_capture02/packet_capture
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.vscode/targets.log
+C-Language/NETWORK/packet_capture02/tmp.pcap
