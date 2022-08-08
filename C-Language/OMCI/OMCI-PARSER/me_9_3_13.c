@@ -196,6 +196,194 @@ void dbg_VLANTaggingOperationTableMapping(VLANTaggingOperationTableMapping_t m){
 
 void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
 {
+    unsigned int filterOuterPrio = m->filterOuterPrio;
+    unsigned int filterOuterVid = m->filterOuterVid;
+    unsigned int filterInnerPrio = m->filterInnerPrio;
+    unsigned int filterInnerVid = m->filterInnerVid;
+    unsigned int treatmentTagsRemove = m->treatmentTagsRemove;
+    unsigned int treatmentOuterPrio = m->treatmentOuterPrio;
+    unsigned int treatmentOuterVid = m->treatmentOuterVid;
+    unsigned int treatmentInnerPrio = m->treatmentInnerPrio;
+    unsigned int treatmentInnerVid = m->treatmentInnerVid;
+
+
+    printf("%s%20s:%4d| ",LIGHT_CYAN,__FILE__,__LINE__);
+
+    if ( filterOuterPrio == THIS_ENRTY_IS_NOT_A_DOUBLE_TAG_RULE &&
+         filterInnerPrio == THIS_ENTRY_IS_A_NO_TAG_RULE ) //untag
+    {
+        printf("Untag         frames : ");
+        printf("F -> ");
+
+        if(treatmentTagsRemove == DROP_THE_FRAME){
+            printf("Drop");
+        }
+        else{
+            if(treatmentOuterPrio != DO_NOT_ADD_AN_OUTER_TAG && treatmentOuterPrio >= 0 && treatmentOuterPrio <= 7)
+                printf("%d/%d-F",treatmentOuterVid,treatmentOuterPrio);
+            else if( treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE)
+                printf("%d-F (derive Pbits from the DSCP field",treatmentOuterVid);
+
+            if(treatmentInnerPrio != DO_NOT_ADD_AN_INNER_TAG && treatmentInnerPrio >= 0 && treatmentInnerPrio <= 7)
+                printf("%d/%d-F",treatmentInnerVid,treatmentInnerPrio);
+            else if(treatmentInnerPrio == ADD_AN_INNER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE)
+                printf("%d-F (derive Pbits from the DSCP field",treatmentInnerVid);
+        }
+    }
+    else if ( filterOuterPrio == 15 &&  filterOuterVid == 4096 && (filterInnerPrio != 15 ||  filterInnerVid != 4096)) //single tag
+    {
+        printf("Single tagged frames : ");
+
+        if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+            printf("%d/%d-F -> ",filterInnerVid,filterInnerPrio);
+        else
+            printf("%d-F -> ",filterInnerVid);
+
+        if(treatmentTagsRemove == DROP_THE_FRAME){
+            printf("Drop");
+        }
+        else if(treatmentTagsRemove == REMOVE_ZERO_TAG){
+            if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+                printf("%d/%d-F",filterInnerVid,filterInnerPrio);
+            else
+                 printf("%d-F",filterInnerVid);
+
+            if(treatmentOuterPrio != DO_NOT_ADD_AN_OUTER_TAG && treatmentOuterPrio >= 0 && treatmentOuterPrio <= 7)
+                printf(" + %d/%d-F",treatmentOuterVid,treatmentOuterPrio);
+            else if(treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_COPY_OUTER_PRIO_FROM_INNER_PRIO_OF_RECEIVED_FRAME)
+                printf(" + %d/%d-F",treatmentOuterVid,filterInnerPrio);
+            else if( treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE)
+                printf(" + %d-F (derive Pbits from the DSCP field",treatmentOuterVid);
+
+            if(treatmentInnerPrio != DO_NOT_ADD_AN_INNER_TAG && treatmentInnerPrio >= 0 && treatmentInnerPrio <= 7)
+                printf(" + %d/%d-F",treatmentInnerVid,treatmentInnerPrio);
+            else if (treatmentInnerPrio == ADD_AN_INNER_TAG_AND_COPY_INNER_PRIO_FROM_INNER_PRIO_OF_RECEIVED_FRAME)
+                printf(" + %d/%d-F",treatmentInnerVid,filterInnerPrio);
+            else if(treatmentInnerPrio == ADD_AN_INNER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE)
+                printf(" + %d-F (derive Pbits from the DSCP field",treatmentInnerVid);
+        }
+        else if(treatmentTagsRemove == REMOVE_ONE_TAG){
+            if(treatmentOuterPrio == DO_NOT_ADD_AN_OUTER_TAG && treatmentInnerPrio == DO_NOT_ADD_AN_INNER_TAG)
+                printf("F");
+            else{
+                //ADD Outer vlan
+                if(treatmentOuterPrio != DO_NOT_ADD_AN_OUTER_TAG){
+                    if(treatmentOuterPrio >= 0 && treatmentOuterPrio <= 7){
+                        printf("%d/%d-F",treatmentOuterVid,treatmentOuterPrio);
+                    }
+                    else if(treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_COPY_OUTER_PRIO_FROM_INNER_PRIO_OF_RECEIVED_FRAME){
+                        if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+                            printf("%d/%d-F",treatmentOuterVid,filterInnerPrio);
+                        else
+                            printf("%d-F",treatmentOuterVid);
+                        }
+                    else if( treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE){
+                        printf("%d-F (derive Pbits from the DSCP field",treatmentOuterVid);
+                    }
+                    printf(" + ");
+                }
+                //ADD Inner vlan
+                if(treatmentInnerPrio != DO_NOT_ADD_AN_INNER_TAG){
+                    if(treatmentInnerPrio >= 0 && treatmentInnerPrio <= 7)
+                        printf("%d/%d-F",treatmentInnerVid,treatmentInnerPrio);
+                    else if (treatmentInnerPrio == ADD_AN_INNER_TAG_AND_COPY_INNER_PRIO_FROM_INNER_PRIO_OF_RECEIVED_FRAME){
+                        if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+                            printf("%d/%d-F",treatmentInnerVid,filterInnerPrio);
+                        else
+                            printf("%d-F",treatmentInnerVid);
+                    }
+                    else if(treatmentInnerPrio == ADD_AN_INNER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE)
+                        printf("%d-F (derive Pbits from the DSCP field",treatmentInnerVid);
+                }
+            }
+        }
+    }
+    else //Double tag
+    {
+        printf("Double tagged frames : ");
+
+        if(filterOuterPrio >= 0 && filterOuterPrio <= 7)
+            printf("%d/%d-F + ",filterOuterVid,filterOuterPrio);
+        else
+            printf("%d-F + ",filterOuterVid);
+
+        if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+            printf("%d/%d-F -> ",filterInnerVid,filterInnerPrio);
+        else
+            printf("%d-F -> ",filterInnerVid);
+
+        //B part
+        if(treatmentTagsRemove == DROP_THE_FRAME){
+            printf("Drop");
+        }
+        
+        //ADD Outer vlan
+        if(treatmentOuterPrio != DO_NOT_ADD_AN_OUTER_TAG){
+            if(treatmentOuterPrio >= 0 && treatmentOuterPrio <= 7){
+                printf("%d/%d-F",treatmentOuterVid,treatmentOuterPrio);
+            }
+            else if(treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_COPY_OUTER_PRIO_FROM_INNER_PRIO_OF_RECEIVED_FRAME){
+                if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+                    printf("%d/%d-F",treatmentOuterVid,filterInnerPrio);
+                else
+                    printf("%d-F",treatmentOuterVid);
+            }
+            else if(treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_COPY_OUTER_PRIO_FROM_OUTER_PRIO_OF_RECEIVED_FRAME){
+                if(filterOuterPrio >= 0 && filterOuterPrio <= 7)
+                    printf("%d/%d-F",treatmentOuterVid,filterOuterPrio);
+                else
+                    printf("%d-F",treatmentOuterVid);
+            }
+            else if( treatmentOuterPrio == ADD_AN_OUTER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE){
+                printf("%d-F (derive Pbits from the DSCP field",treatmentOuterVid);
+            }
+            printf(" + ");
+        }
+        //ADD Inner vlan
+        if(treatmentInnerPrio != DO_NOT_ADD_AN_INNER_TAG){
+            if(treatmentInnerPrio >= 0 && treatmentInnerPrio <= 7)
+                printf("%d/%d-F",treatmentInnerVid,treatmentInnerPrio);
+            else if (treatmentInnerPrio == ADD_AN_INNER_TAG_AND_COPY_INNER_PRIO_FROM_INNER_PRIO_OF_RECEIVED_FRAME){
+                if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+                    printf("%d/%d-F",treatmentInnerVid,filterInnerPrio);
+                else
+                    printf("%d-F",treatmentInnerVid);
+            }
+            else if (treatmentInnerPrio == ADD_AN_INNER_TAG_AND_COPY_INNER_PRIO_FROM_OUTER_PRIO_OF_RECEIVED_FRAME ){
+                if(filterOuterPrio >= 0 && filterOuterPrio <= 7)
+                    printf("%d/%d-F",treatmentInnerVid,filterOuterPrio);
+                else
+                    printf("%d-F",treatmentInnerVid);
+            }
+            else if(treatmentInnerPrio == ADD_AN_INNER_TAG_AND_DERIVE_PBIT_FROM_DSCP_TABLE)
+                printf("%d-F (derive Pbits from the DSCP field",treatmentInnerVid);
+            
+            printf(" + ");
+        }
+
+        if(treatmentTagsRemove == REMOVE_ZERO_TAG){
+            if(filterOuterPrio >= 0 && filterOuterPrio <= 7)
+                printf("%d/%d-F + ",filterOuterVid,filterOuterPrio);
+            else
+                printf("%d-F + ",filterOuterVid);
+
+            if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+                printf("%d/%d-F",filterInnerVid,filterInnerPrio);
+            else
+                printf("%d-F",filterInnerVid);
+        }
+        else if(treatmentTagsRemove == REMOVE_ONE_TAG){
+            if(filterInnerPrio >= 0 && filterInnerPrio <= 7)
+                printf("%d/%d-F",filterInnerVid,filterInnerPrio);
+            else
+                printf("%d-F",filterInnerVid);
+        }
+    }
+    printf("%s\n",NONECOLOR);
+}
+#if 0
+void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
+{
     printf("%s%20s:%4d ===>  ",LIGHT_CYAN,__FILE__,__LINE__);
     int outerf = 0;
     int innerf = 0;
@@ -210,7 +398,7 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
         printf("%d",m->filterOuterVid);
         if(m->filterOuterPrio>=0 && m->filterOuterPrio<=7)
             printf("/%d",m->filterOuterPrio);
-        printf("-");
+        printf(" -");
         outerf = 1;
     }
 
@@ -218,10 +406,18 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
         printf("%d",m->filterInnerVid);
         if(m->filterInnerPrio>=0 && m->filterInnerPrio<=7)
             printf("/%d",m->filterInnerPrio);
-        printf("-");
+        printf(" -");
         innerf = 1;
     }
-    printf("F --> ");
+    else if(m->filterInnerPrio == 8 && m->filterInnerVid == 4096)
+    {
+        printf(" 4096");
+    }
+
+    if(innerf == 0 && outerf ==0)
+        printf("F --> ");
+    else
+        printf(" F --> ");
 
     //part 3
     if(m->treatmentTagsRemove == 0){
@@ -414,6 +610,7 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
     
     printf("%s\n",NONECOLOR);
 }
+#endif //0
 
 void me_9_3_13_parser(omci_t *omci,const unsigned char *meName)
 {
