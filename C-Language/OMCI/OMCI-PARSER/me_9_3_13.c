@@ -230,7 +230,8 @@ void parser_vlan_tagging_operation(VLANTaggingOperationTableMapping_t *m)
                 printf("%d-F (derive Pbits from the DSCP field",treatmentInnerVid);
         }
     }
-    else if ( filterOuterPrio == 15 &&  filterOuterVid == 4096 && (filterInnerPrio != 15 ||  filterInnerVid != 4096)) //single tag
+    else if ( filterOuterPrio == THIS_ENRTY_IS_NOT_A_DOUBLE_TAG_RULE &&
+              filterInnerPrio != THIS_ENTRY_IS_A_NO_TAG_RULE ) //single tag
     {
         printf("Single tagged frames : ");
 
