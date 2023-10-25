@@ -1,0 +1,218 @@
+	  omci.c:  16| OMCI MSG [001] : 2ff2480a00ab0a010400f8000000f0055000002f0000000a04920000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2ff2
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f8000000f0055000002f0000000a04920000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f8000000f0055000002f0000000a0492)
+ me_9_3_13.c: 170| word: f8000000 | f0055000 | 002f0000 | 000a0492
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 0000000f - 15
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 0000000a - 10
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000000 - 0
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 0000000a - 10
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000092 - 146
+ me_9_3_13.c: 210| Untag         frames : F -> 146-F (derive Pbits from the DSCP field
+
+	  omci.c:  16| OMCI MSG [002] : 2132480a00ab0a010400f800000010055000402f0000000104920000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2132
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f800000010055000402f0000000104920000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f800000010055000402f000000010492)
+ me_9_3_13.c: 170| word: f8000000 | 10055000 | 402f0000 | 00010492
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 00000001 - 1
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 0000000a - 10
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000001 - 1
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 00000001 - 1
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000092 - 146
+ me_9_3_13.c: 210| Single tagged frames : 10/1-F -> 146/1-F
+
+	  omci.c:  16| OMCI MSG [003] : 2142480a00ab0a010400f800000040055000402f0000000404920000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2142
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f800000040055000402f0000000404920000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f800000040055000402f000000040492)
+ me_9_3_13.c: 170| word: f8000000 | 40055000 | 402f0000 | 00040492
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 00000004 - 4
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 0000000a - 10
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000001 - 1
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 00000004 - 4
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000092 - 146
+ me_9_3_13.c: 210| Single tagged frames : 10/4-F -> 146/4-F
+
+	  omci.c:  16| OMCI MSG [004] : 2152480a00ab0a010400f800000060055000402f0000000604920000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2152
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f800000060055000402f0000000604920000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f800000060055000402f000000060492)
+ me_9_3_13.c: 170| word: f8000000 | 60055000 | 402f0000 | 00060492
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 00000006 - 6
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 0000000a - 10
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000001 - 1
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 00000006 - 6
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000092 - 146
+ me_9_3_13.c: 210| Single tagged frames : 10/6-F -> 146/6-F
+
+	  omci.c:  16| OMCI MSG [005] : 2162480a00ab0a010400f800000010005000402f0000000104920000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2162
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f800000010005000402f0000000104920000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f800000010005000402f000000010492)
+ me_9_3_13.c: 170| word: f8000000 | 10005000 | 402f0000 | 00010492
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 00000001 - 1
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 00000000 - 0
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000001 - 1
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 00000001 - 1
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000092 - 146
+ me_9_3_13.c: 210| Single tagged frames : 0/1-F -> 146/1-F
+
+	  omci.c:  16| OMCI MSG [006] : 2172480a00ab0a010400f800000040005000402f0000000404920000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2172
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f800000040005000402f0000000404920000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f800000040005000402f000000040492)
+ me_9_3_13.c: 170| word: f8000000 | 40005000 | 402f0000 | 00040492
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 00000004 - 4
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 00000000 - 0
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000001 - 1
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 00000004 - 4
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000092 - 146
+ me_9_3_13.c: 210| Single tagged frames : 0/4-F -> 146/4-F
+
+	  omci.c:  16| OMCI MSG [007] : 2182480a00ab0a010400f800000060005000402f0000000604920000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2182
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f800000060005000402f0000000604920000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f800000060005000402f000000060492)
+ me_9_3_13.c: 170| word: f8000000 | 60005000 | 402f0000 | 00060492
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 00000006 - 6
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 00000000 - 0
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000001 - 1
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 00000006 - 6
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000092 - 146
+ me_9_3_13.c: 210| Single tagged frames : 0/6-F -> 146/6-F
+
+	  omci.c:  16| OMCI MSG [008] : 2133480a00ab0a010400f80000008032d000400f00000008014a0000000000000000000000000000
+ omci_util.c:  46| OMCI TCID      : 2133
+ omci_util.c:  47| OMCI MSG TYPE  : 48
+ omci_util.c:  48| OMCI DEVICE ID : 0a
+ omci_util.c:  49| OMCI ME ID     : 171
+ omci_util.c:  50| OMCI INSTANCE  : 2561
+ omci_util.c:  51| OMCI CONTECT   : 0400f80000008032d000400f00000008014a0000000000000000000000000000
+ me_9_3_13.c: 625| OLT > Set - Extended VLAN tagging operation configuration data
+ me_9_3_13.c: 636| AttrMask = 400 ; Covert to binary : 0000010000000000 --- 
+ omci_util.c:  81| Attr[006] Received frame VLAN tagging operation table : (f80000008032d000400f00000008014a)
+ me_9_3_13.c: 170| word: f8000000 | 8032d000 | 400f0000 | 0008014a
+ me_9_3_13.c: 171| word[1] filterOuterPrio      - 0000000f - 15
+ me_9_3_13.c: 172| word[1] filterOuterVid       - 00001000 - 4096
+
+ me_9_3_13.c: 177| word[2] filterInnerPrio      - 00000008 - 8
+ me_9_3_13.c: 178| word[2] filterInnerVid       - 00000065 - 101
+ me_9_3_13.c: 179| word[2] filterInnerTpidde    - 00000005 - 5
+ me_9_3_13.c: 181| word[2] filterEtherType      - 00000000 - 0
+
+ me_9_3_13.c: 184| word[3] treatmentTagsRemove  - 00000001 - 1
+ me_9_3_13.c: 186| word[3] treatmentOuterPrio   - 0000000f - 15
+ me_9_3_13.c: 187| word[3] treatmentOuterVid    - 00000000 - 0
+
+ me_9_3_13.c: 192| word[4] treatmentInnerPrio   - 00000008 - 8
+ me_9_3_13.c: 193| word[4] treatmentInnerVid    - 00000029 - 41
+ me_9_3_13.c: 210| Single tagged frames : 101-F -> 41-F
+
+
+omciparser.c:  90| Total OMCI number : 8

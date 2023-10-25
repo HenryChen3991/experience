@@ -31,4 +31,30 @@ void main(void)
    printf("%f\n",a);
    a = (5.0/2.0);
    printf("%f\n",a);
+
+   int error = -1;
+  if(error)
+	printf("error : %d\n",error);
+
+   unsigned char s7[10]={0};
+   s7[0] = strlen("ab");
+   printf("0x%x\n",s7[0]);
+   snprintf(&s7[2],strlen("ab")+1,"%s","ab");
+   printf("0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",s7[0],s7[1],s7[2],s7[3],s7[4],s7[5]);
+
+   char c = -2;
+   printf("c = 0x%2x\n",c);
+
+   unsigned short la = 106;
+   printf("short la : 0x%04x\n",la);
+
+   unsigned char *lla = (unsigned char*)&la;
+   printf("short la upper : 0x%02x , lower : 0x%02x\n",lla[0],lla[1]);
+
+
+   char *ssptr = "aaa";
+   if(strcmp(ssptr,"aaa")==0)
+       printf("aa\n");
+   else
+       printf("bb\n");
 }

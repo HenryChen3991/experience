@@ -19,9 +19,13 @@ void main(void)
 
 	double i = 5111222333444555;
 	printf("i = %.0lf\n",i);
-	while(1){
+/*	while(1){
 		aaa();
 		a++;
 		sleep(2);
 	}
+*/
+	int b=-1;
+	if(b)
+		printf("bbb\n");
 }

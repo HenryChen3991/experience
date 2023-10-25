@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OBJ="bbn-omci-zhang"
+OBJ="FR51782"
 
 
 make clean
