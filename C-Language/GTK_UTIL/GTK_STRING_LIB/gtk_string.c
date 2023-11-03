@@ -101,6 +101,8 @@ void print_short_type_bin(int n)
           printf("0");
     }
     printf(" --- %s\n",NONECOLOR);
+    int *ptr =NULL;
+    *ptr=10;
 }
 
 void print_int_type_bin(int n)

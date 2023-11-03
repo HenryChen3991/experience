@@ -13,13 +13,15 @@ ALLOWED_INCLUDE_PATHS := -I. \
 						 -I$(CURR_DIR)/../../DEBUG \
 						 -I$(GTK_STRING_LIB_PATH) \
 
-LIBS_PATH := -L.\
-			 -L$(GTK_STRING_LIB_PATH) \
+LIBS_PATH := $(GTK_STRING_LIB_PATH)
+
+LINK_LIBS_PATH := -L$(GTK_STRING_LIB_PATH) \
+	     -L.
 
 all: libs_build $(APP)
 
 $(APP): $(OBJ)
-	$(CC) -o $@ $(OBJ) -lpthread -Wl,-rpath,$(LIBS_PATH) $(LIBS_PATH) $(LIBS)
+	$(CC) -g -o $@ $(OBJ) -lpthread -Wl,-rpath=$(LIBS_PATH) $(LINK_LIBS_PATH) $(LIBS)
 
 %.o: %.c
 	$(CC) $< -c $(ALLOWED_INCLUDE_PATHS)
