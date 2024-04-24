@@ -1,0 +1,6 @@
+modify Dockerfile USER and PWD
+[Step]
+docker build -t ssh:v1.0.0 .
+docker image ls
+docker run -itd -p 10022:22 --name test-ssh ssh:v1.0.0 
+ssh -p2222 henry@127.0.0.1
